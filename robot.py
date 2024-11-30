@@ -50,9 +50,9 @@ while True:
         
         
         
-        if (abs(M0 - TARGET) < countThreshold) and ((M0 - prevM0)/(time.time() - t) < countsPerSecondThreshold):
-            print(M0)
-            break
+#        if (abs(M0 - TARGET) < countThreshold) and abs((M0 - prevM0)/(time.time() - t)) < countsPerSecondThreshold):
+#            print(M0)
+#            break
 
     prevM0 = M0
     t = time.time()
