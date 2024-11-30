@@ -17,6 +17,8 @@ WINDOW = 200
 
 THRESHOLD = 0.01
 
+countThreshold = 30
+countsPerSecondThreshold = 30
 outputLimit = 1000
 
 vals = [0.01, 0.1, 1, 10, 100]
@@ -30,11 +32,14 @@ def powerByCount(pCount):
     
     remaining = TARGET - pCount
     res = remaining/WINDOW
-    print(f"Count: {pCount}, Motor Power: {res}");
+    print(f"Count: {pCount}, Motor Power: {res}")
     
     return res
     
+t = time.time()
+prevM0 = 0
 while True:
+    
     receivedData = robot.arduino.command("m")
     
     if receivedData[-1] != '|':
@@ -45,9 +50,13 @@ while True:
         
         
         
-        if abs(mb.motors[0].power) < THRESHOLD:
+        if (abs(M0 - TARGET) < countThreshold) and ((M0 - prevM0)/(time.time() - t) < countsPerSecondThreshold):
             print(M0)
-            break;
+            break
+
+    prevM0 = M0
+    t = time.time()
+    
 print("Exited.")
     
 
