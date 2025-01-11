@@ -1,64 +1,121 @@
 from sr.robot3 import *
 import time
+from datetime import datetime
 from pid import PID
 
 ARDUINO_SERIAL = "7523031383335161A231"
 BAUD = 115200
 robot = Robot(raw_ports = [(ARDUINO_SERIAL, BAUD)])
 mb = robot.motor_board
-#mb.motors[1].power = 1
 
-numberOfBytes = 8
+#R, L = 0, 1
 
-COUNTS_PER_REVOL = 1575
+COUNTS_PER_REVOL = 2720
 
-TARGET = 16000
+DISTANCE = 3
+distance10Revols = 3.92 #m
+loops = 10
+FACTOR = 10
+INITIAL = FACTOR * int(COUNTS_PER_REVOL * DISTANCE / distance10Revols)
+TARGET = INITIAL
 WINDOW = 200
 
 THRESHOLD = 0.01
 
-countThreshold = 30
-countsPerSecondThreshold = 30
-outputLimit = 1000
+DEBUG = False
+DEBUG_TIME = datetime.now()
+DEBUG_TIMES = DEBUG_TIME.strftime("%d.%m.%Y_%H.%M.%S")
+DEBUG_FILE = open(f"log_{DEBUG_TIMES}.txt", "w")
 
-vals = [0.01, 0.1, 1, 10, 100]
+def debug(s):
+    if DEBUG:
+        DEBUG_FILE.write(f"{s}\n")
 
 def f(x):
     return x
-def powerByCount(pCount):
-
+    
+def clamp(val, min, max):
+    if (val < min):
+        return min
+    elif (val > max):
+        return max
+    else:
+        return val
+    
+def powerByCount(pCount, pMotor, f):
     if pCount < TARGET - WINDOW:
+        debug(f"Motor {pMotor}: Count: {pCount}, Motor Power: 1\n")
         return 1.0
     
     remaining = TARGET - pCount
-    res = remaining/WINDOW
-    print(f"Count: {pCount}, Motor Power: {res}")
+    res = clamp(remaining / WINDOW, -1, 1)
+    debug(f"Motor {pMotor}: Count: {pCount}, Motor Power: {res}\n")
     
     return res
     
+"""
 t = time.time()
-prevM0 = 0
-while True:
-    
-    receivedData = robot.arduino.command("m")
-    
-    if receivedData[-1] != '|':
-        print(f"Bad message received \"{receivedData}\"")
-    else:
-        M0 = int(receivedData.split(";")[0])
-        mb.motors[0].power = powerByCount(M0)
+time.sleep(3)
+for _ in range(loops):
+    robot.arduino.command("c")
+    initial = time.time()
+    while time.time() - initial < 60:
+        debug(f"[{time.time() - initial}]")
+        receivedData = robot.arduino.command("m")
+        debug(f"Received Data: '{receivedData}'")
+            
+        receivedDataSplit = receivedData.split(";")
         
-        
-        
-#        if (abs(M0 - TARGET) < countThreshold) and abs((M0 - prevM0)/(time.time() - t)) < countsPerSecondThreshold):
-#            print(M0)
-#            break
+        if receivedData[-1] != '|':
+            debug(f"Bad message received \"{receivedData}\"")
+        else:
+            
+            M0 = int(receivedDataSplit[0])
+            mb.motors[0].power = powerByCount(M0,0,f)
 
-    prevM0 = M0
-    t = time.time()
+            M1 = int(receivedDataSplit[1][:-1])
+            mb.motors[1].power = powerByCount(M1,1,f)
+        
+debug("Exited.")
+DEBUG_FILE.close()
+"""
     
-print("Exited.")
+
+def RobotDrive(dist):
+    DISTANCE = dist
+    INITIAL = FACTOR * int(COUNTS_PER_REVOL * DISTANCE / distance10Revols)
+    TARGET = INITIAL
     
+    robot.arduino.command("c")
+    initial = time.time()
+    while time.time() - initial < 60:
+        debug(f"[{time.time() - initial}]")
+        receivedData = robot.arduino.command("m")
+        debug(f"Received Data: '{receivedData}'")
+            
+        receivedDataSplit = receivedData.split(";")
+        
+        if receivedData[-1] != '|':
+            debug(f"Bad message received \"{receivedData}\"")
+        else:
+            
+            M0 = int(receivedDataSplit[0])
+            mb.motors[0].power = powerByCount(M0,0,f)
+
+            M1 = int(receivedDataSplit[1][:-1])
+            mb.motors[1].power = powerByCount(M1,1,f)
+
+def ExitDebug():
+    DEBUG_FILE.close()
+
+## PUT DRIVING CODE HERE ##
+
+RobotDrive(2)
+
+##    END DRIVING CODE   ##
+
+ExitDebug()
+
 
 """
 
