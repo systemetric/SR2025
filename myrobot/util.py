@@ -12,6 +12,9 @@ class MyRobotDebug:
         thisTimeFmt = thisTime.strftime("%d.%m.%Y_%H.%M.%S")
         self.DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")
 
+    def __del__(self):
+        self.stop()
+
     def setEnabled(self, enabled):
         self.DEBUG = enabled
 
