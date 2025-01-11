@@ -6,10 +6,11 @@ from pid import PID
 
 class MyRobot:
     TARGET_MOTORS = [0,1]
+    REVERSE = [1, 1]
     COUNTS_PER_REVOL = 2720
     REVOL_DIST = 0.392 #m
-    ACCURACY = 30
-    P, I, D = [1, 0.01, 0.5]
+    ACCURACY = 100
+    P, I, D = [1, 0.5, 0.5]
     ARDUINO_SERIAL = "7523031383335161A231"
     BAUD = 115200
     ROBOT = None
@@ -39,9 +40,9 @@ class MyRobot:
         targetCount = int(self.COUNTS_PER_REVOL * pDistance / self.REVOL_DIST)
 
         #Initialise PID objects
-        m0PID = PID(self.P, self.I, self.D, setpoint = targetCount)
+        m0PID = PID(self.P, self.I, self.D, setpoint = targetCount * self.REVERSE[0])
         m0PID.output_limits = (-1,1)
-        m1PID = PID(self.P, self.I, self.D, setpoint = targetCount)
+        m1PID = PID(self.P, self.I, self.D, setpoint = targetCount * self.REVERSE[1])
         m1PID.output_limits = (-1,1)
         
         #reset motor counts
@@ -79,25 +80,29 @@ class MyRobot:
         arcRadius = 0.425 #m
         halfArc = arcRadius * math.pi #m
 
-        self.RobotDrive(halfArc * (pAngle / 180))
+        self.RobotDrive(halfArc * (pAngle / 180) * 0.5)
 
     def forward(self, distance):
         self.TARGET_MOTORS = [0, 1]
+        self.REVERSE = [1, 1]
         self.RobotDrive(distance)
 
     def reverse(self, distance):
         self.TARGET_MOTORS = [0, 1]
+        self.REVERSE = [1,1]
         self.RobotDrive(-distance)
 
     def right(self, angle, isRadians = False):
-        self.TARGET_MOTORS = [1]
+    #    self.TARGET_MOTORS = [1]
+        self.REVERSE = [-1, 1]
         if isRadians:
             self.RobotRotate(angle * (math.pi / 180))
         else:
             self.RobotRotate(angle)
 
     def left(self, angle, isRadians = False):
-        self.TARGET_MOTORS = [0]
+   #     self.TARGET_MOTORS = [0]
+        self.REVERSE = [1, -1]
         if isRadians:
             self.RobotRotate(angle * (math.pi / 180))
         else:

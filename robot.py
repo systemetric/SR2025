@@ -3,5 +3,5 @@ from myrobot import *
 robot = MyRobot()
 
 for i in range(4):
-    robot.forward(2)
-    robot.rotate(90)
+    robot.forward(1)
+    robot.left(90)
