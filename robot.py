@@ -2,6 +2,7 @@ from sr.robot3 import *
 import time
 from datetime import datetime
 from pid import PID
+import math
 
 ARDUINO_SERIAL = "7523031383335161A231"
 BAUD = 115200
@@ -13,16 +14,19 @@ mb = robot.motor_board
 COUNTS_PER_REVOL = 2720
 
 DISTANCE = 3
-distance10Revols = 3.92 #m
+revolDistance = 0.392 #m
 loops = 10
-FACTOR = 10
-INITIAL = FACTOR * int(COUNTS_PER_REVOL * DISTANCE / distance10Revols)
-TARGET = INITIAL
+
+INITIAL = 0
+TARGET = 0
 WINDOW = 200
+
+DMOTOR0 = 0
+DMOTOR1 = 1
 
 THRESHOLD = 0.01
 
-DEBUG = False
+DEBUG = True
 DEBUG_TIME = datetime.now()
 DEBUG_TIMES = DEBUG_TIME.strftime("%d.%m.%Y_%H.%M.%S")
 DEBUG_FILE = open(f"log_{DEBUG_TIMES}.txt", "w")
@@ -42,12 +46,12 @@ def clamp(val, min, max):
     else:
         return val
     
-def powerByCount(pCount, pMotor, f):
-    if pCount < TARGET - WINDOW:
+def powerByCount(pCount, pMotor, pTarget):
+    if pCount < pTarget - WINDOW:
         debug(f"Motor {pMotor}: Count: {pCount}, Motor Power: 1\n")
         return 1.0
     
-    remaining = TARGET - pCount
+    remaining = pTarget - pCount
     res = clamp(remaining / WINDOW, -1, 1)
     debug(f"Motor {pMotor}: Count: {pCount}, Motor Power: {res}\n")
     
@@ -79,17 +83,16 @@ for _ in range(loops):
 debug("Exited.")
 DEBUG_FILE.close()
 """
-    
 
-def RobotDrive(dist):
-    DISTANCE = dist
-    INITIAL = FACTOR * int(COUNTS_PER_REVOL * DISTANCE / distance10Revols)
-    TARGET = INITIAL
+
+def RobotDrive(distance, dm = 2):
+    targetCount = int(COUNTS_PER_REVOL * distance / revolDistance)
     
     robot.arduino.command("c")
-    initial = time.time()
-    while time.time() - initial < 60:
-        debug(f"[{time.time() - initial}]")
+    initialTime = time.time()
+
+    while time.time() - initialTime < 60:
+        debug(f"[{time.time() - initialTime}]")
         receivedData = robot.arduino.command("m")
         debug(f"Received Data: '{receivedData}'")
             
@@ -99,18 +102,26 @@ def RobotDrive(dist):
             debug(f"Bad message received \"{receivedData}\"")
         else:
             
-            M0 = int(receivedDataSplit[0])
-            mb.motors[0].power = powerByCount(M0,0,f)
+            if (dm == 0 or dm == 2):
+                M0 = int(receivedDataSplit[0])
+                mb.motors[0].power = powerByCount(M0,0, targetCount)
 
-            M1 = int(receivedDataSplit[1][:-1])
-            mb.motors[1].power = powerByCount(M1,1,f)
+            if (dm == 1 or dm == 2):
+                M1 = int(receivedDataSplit[1][:-1])
+                mb.motors[1].power = powerByCount(M1,1, targetCount)
+
+def RobotRotate(a, m):
+    RobotDrive(((0.425 * math.pi) / 180) * a, m)
 
 def ExitDebug():
     DEBUG_FILE.close()
 
 ## PUT DRIVING CODE HERE ##
+debug("Started")
 
-RobotDrive(2)
+
+RobotDrive(1)
+RobotRotate(90, DMOTOR0)
 
 ##    END DRIVING CODE   ##
 
