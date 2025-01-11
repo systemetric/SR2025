@@ -31,20 +31,8 @@ DEBUG_TIME = datetime.now()
 DEBUG_TIMES = DEBUG_TIME.strftime("%d.%m.%Y_%H.%M.%S")
 DEBUG_FILE = open(f"log_{DEBUG_TIMES}.txt", "w")
 
-def debug(s):
-    if DEBUG:
-        DEBUG_FILE.write(f"{s}\n")
-
 def f(x):
     return x
-    
-def clamp(val, min, max):
-    if (val < min):
-        return min
-    elif (val > max):
-        return max
-    else:
-        return val
     
 def powerByCount(pCount, pMotor, pTarget):
     if pCount < pTarget - WINDOW:
