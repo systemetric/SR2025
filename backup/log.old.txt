@@ -1,0 +1,33 @@
+[0:00:00] ---
+[0:00:00] Student Robotics OS 2025.0.0
+[0:00:00] Is there something you'd like us to add to the kit or API? 💡
+[0:00:00] Perhaps there's something you think we should improve? 🛠️
+[0:00:00] Let us know your feedback about your experience using our kit at https://studentrobotics.org/kit-feedback 🗣️
+[0:00:00] ---
+[0:00:00] === LOG STARTED ===
+[0:00:01.776312] sr.robot3.robot - INFO - sr.robot3 version 2025.0.1
+[0:00:02.264005] sr.robot3.serial_wrapper - INFO - Connected to board Power Board v4: sr0RR2G
+[0:00:02.268958] sr.robot3.serial_wrapper - INFO - Connected to board MCV4B: SR0UK1L
+[0:00:02.273808] sr.robot3.serial_wrapper - INFO - Connected to board Servo Board v4: sr0VX25
+[0:00:03.925485] sr.robot3.serial_wrapper - INFO - Connected to board Ruggeduino: 7523031383335161A231
+[0:00:05.943031] sr.robot3.raw_serial - INFO - Connected to port Ruggeduino: 7523031383335161A231
+[0:00:06.094744] sr.robot3.robot - INFO - Found PowerBoard, serial: sr0RR2G
+[0:00:06.100354] sr.robot3.robot - INFO - Found MotorBoard, serial: SR0UK1L
+[0:00:06.106555] sr.robot3.robot - INFO - Found ServoBoard, serial: sr0VX25
+[0:00:06.111682] sr.robot3.robot - INFO - Found Arduino, serial: 7523031383335161A231
+[0:00:06.116786] sr.robot3.robot - INFO - Found RawSerial, serial: 7523031383335161A231
+[0:00:06.121784] sr.robot3.robot - INFO - Waiting for start button.
+[0:00:08.719582] sr.robot3.robot - INFO - Start signal received; continuing.
+[0:00:08.767965] 0 0
+[0:00:09.733319] sr.robot3.serial_wrapper - WARNING - Board SRcustom:7523031383335161A231 returned invalid characters: b'\xf7\x06\x00\x00\x8a\x06\x00\x00\n'
+[0:00:10.278290] sr.robot3.serial_wrapper - WARNING - Board SRcustom:7523031383335161A231 returned invalid characters: b'\xfe\x06\x00\x00\x90\x06\x00\x00\n'
+[0:00:10.284926] sr.robot3.serial_wrapper - WARNING - Board SRcustom:7523031383335161A231 returned invalid characters: b'\xc7\n'
+[0:00:11.243095] Traceback (most recent call last):
+[0:00:11.767689]   File "/media/robot/F462-A81611/robot.py", line 19, in <module>
+[0:00:11.773679]     print(sum([ord(M0[i]) *256** (3-i) for i in range(0,4)]), sum([ord(M1[i]) * 256** (3-i) for i in range(0,4)]))
+[0:00:11.778740]               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[0:00:11.783662]   File "/media/robot/F462-A81611/robot.py", line 19, in <listcomp>
+[0:00:11.788573]     print(sum([ord(M0[i]) *256** (3-i) for i in range(0,4)]), sum([ord(M1[i]) * 256** (3-i) for i in range(0,4)]))
+[0:00:11.793389]                    ~~^^^
+[0:00:11.798175] IndexError: string index out of range
+[0:00:11.809033] === LOG FINISHED ===

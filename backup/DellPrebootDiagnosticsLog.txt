@@ -1,0 +1,418 @@
+Ediags Version:ED.4.3.0, Service Tag:9DWYY64, Bios Version: 1.8.0, System ID: 3207
+
+[ AUDIOSPEAKER ]
+    Beep Generator = Speaker/Buzzer
+
+[ BATTERY ]
+    Primary Battery
+        ChargeCycles = 2
+        Temperature = 19C
+        Voltage = 11500mV
+        Current = 1544mA
+        RemainingCapacity =  0.654Ah
+        FullCapacity =  4.762Ah
+        RelativeCharge = 14%
+        Health = Excellent
+        ManufactureDate = 10/9/2024
+        SerialNumber = 87F
+
+[ CHARGER ]
+    ChargerState = Installed
+
+[ CABLES ]
+    ePPID = CN0CH5X9CMK004B1005EA00
+    Platform SSID = 0C87
+    Intruder Status = No Intrusion Sensed
+    CPU = Installed
+    Memory Module = Installed
+    Functional Memory = Installed
+    Memory SPD = Installed
+    Touch Pad = Installed
+    Keyboard = Installed
+    LCD Cable = Installed
+    Keyboard Backlight Option = Installed
+    Bluetooth = Installed
+    Wireless LAN = Installed
+
+[ STORAGE ]
+    Disk 1
+        OEM = KIOXIA
+        Product = BG6 KIOXIA 512GB
+        Revision = 12000103
+        Serial Number = 8E5PS2NEZ0ZS
+        Type = NVMe
+        Size = 512 GB
+        Form Factor = M.2
+        PPID = TW0DFMP3PIDKK48502DEA02
+        Location = M.2 PCIe SSD-0
+
+[ BOOT ]
+    BootPath = MBR of Disk 1
+
+[ FAN ]
+    Processor Fan = 0 RPM
+    Video Fan = 0 RPM
+
+[ LCD PANEL ]
+    Horizontal resolution = 2560 pixels
+    Vertical resolution = 1600 pixels
+    EDID Length = 256 bytes
+    LCD Panel Manufacture ID = 104D
+    LCD Panel Product ID = 158F
+    LCD Panel supports BIST = Yes
+
+[ MEMORY ]
+    System Memory = 32768 MB
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+        Motherboard = 4096 MB, LPDDR5, 7467 MHz
+
+[ PCIe ]
+    PCIe Physical Slots = 3
+        Bus 01, PCIe Slot 12 = empty
+        Bus 39, PCIe Slot 15 = empty
+        Bus 71, PCIe Slot  7 = Vendor 8086, Device 272B, SubVendor 8086, SubDevice 40F0, Tag 7100
+
+[ PROCESSOR ]
+    Processor Sockets = 1
+        U3E1 = Intel(R) Core(TM) Ultra 7 155H @ 3.76GHz
+
+[ SYSTEM MANAGEMENT ]
+    ProcHot Temperature = 115C
+    Temperature Sensor = CPU
+    Temperature Sensor = SKIN
+    Temperature Sensor = DIMM A
+    Temperature Sensor = SKIN
+    Temperature Sensor = SKIN
+    Temperature Sensor = SKIN
+
+[ USB ]
+    USB2.0 Hub = 05E3 : 0618
+    USB Storage = 05E3 : 0752
+        Manufacturer = Generic
+    USB 10/100 LAN = 0BDA : 8152
+        Manufacturer = Realtek
+        Serial Number = 00E02C2700C8
+    USB2.0 Hub = 05E3 : 0608
+    USB DISK 2.0 = 13FE : 4100
+        Manufacturer =         
+        Serial Number = 0702251C80B7EC69
+    USB Bridge = 8086 : 0B63
+        Manufacturer = MCHP
+    Goodix Fingerprint USB Device = 27C6 : 633C
+        Manufacturer = Goodix Technology Co., Ltd.
+        Serial Number = UIDCB4E87FB_XXXX_MOC_B0
+    Wireless Cntrlr = 8087 : 0036
+
+[ VIDEO ]
+    Vendor Id = 8086
+    Device Id = 7D55
+    Product Name = Intel(R) Graphics Controller
+    Memory Size = 15.62 MB
+    Address = 0x60800000
+
+[ Diag Events ]
+DIAG12/07/2024 11:02:21Pass ED.4.3.0 Result:2000:0000 Validate code:104137 ePSA Quick test pass
+
+[ Detailed View ]
+** Cables - Functional Test **
+Test Started : 10:56:17Test Ended : 10:56:17
+Test Result: Success
+Elapsed Time: 00:00:00
+
+** PCI-e Bus - Functional Test **
+Test Started : 10:56:17
+Bus 01: Link Not Active, PCIe Slot 12, empty
+Bus 39: Link Not Active, PCIe Slot 15, empty
+Bus 71: Link Not Active, PCIe Slot 7, empty
+Bus 71: Link Trained x1, Speed Max 16.0 GT/s, Neg 16.0 GT/s, PCIe Slot 07
+Test Ended : 10:56:18
+Test Result: Success
+Elapsed Time: 00:00:01
+
+** Disk 1 - Basic Test **
+Test Started : 10:56:18
+SMART Health Test Start
+Checking SMART Health log page ...
+SMART Health Test End
+Test Ended : 10:56:19
+Test Result: Success
+Elapsed Time: 00:00:01
+
+** Disk 1 - Basic Test (Short DST) **
+Test Started : 10:56:19
+
+** OS Boot Path - Basic Test **
+Test Started : 10:56:19
+Testing MBR of Disk 1
+Test Ended : 10:56:19
+Test Result: Success
+Elapsed Time: 00:00:00
+
+** USB Devices - USB Devices Status Test **
+Test Started : 10:56:20
+USB2.0 Hub 05E3:0618
+USB Storage 05E3:0752
+USB 10/100 LAN 0BDA:8152
+USB2.0 Hub 05E3:0608
+USB DISK 2.0 13FE:4100
+USB Bridge 8086:0B63
+Goodix Fingerprint USB Device 27C6:633C
+Wireless Cntrlr 8087:0036
+Test Ended : 10:56:21
+Test Result: Success
+Elapsed Time: 00:00:01
+
+** Primary Battery - Functional Test **
+Test Started : 10:56:21
+Battery is good.Continue Using it !!
+Test Ended : 10:56:21
+Test Result: Success
+Elapsed Time: 00:00:00
+
+** Charger - Functional Test **
+Test Started : 10:56:22
+AC Adapter Present: Yes
+AC Adapter Power: 50 Watts
+Test Ended : 10:56:22
+Test Result: Success
+Elapsed Time: 00:00:00
+
+** Processor Fan - Functional Test **
+Test Started : 10:56:22
+Detected fan RPM .... 0
+Test Method ........ Finish Line
+Target fan RPM.........: 4900
+Detected fan RPM.......: 0
+Tolerance in percent...: 40
+Target fan RPM.........: 4900
+Detected fan RPM.......: 2780
+Tolerance in percent...: 40
+Low Speed Test Complete ...
+Target fan RPM.........: 6800
+Detected fan RPM.......: 3858
+Tolerance in percent...: 40
+Target fan RPM.........: 6800
+Detected fan RPM.......: 4237
+Tolerance in percent...: 40
+High Speed Test Complete ...
+Test Ended : 10:56:28
+Test Result: Success
+Elapsed Time: 00:00:06
+
+** Video Fan - Functional Test **
+Test Started : 10:56:29
+Detected fan RPM .... 0
+Test Method ........ Finish Line
+Target fan RPM.........: 4600
+Detected fan RPM.......: 0
+Tolerance in percent...: 40
+Target fan RPM.........: 4600
+Detected fan RPM.......: 3189
+Tolerance in percent...: 40
+Low Speed Test Complete ...
+Target fan RPM.........: 6500
+Detected fan RPM.......: 4079
+Tolerance in percent...: 40
+High Speed Test Complete ...
+Test Ended : 10:56:33
+Test Result: Success
+Elapsed Time: 00:00:04
+
+Disk 1 Short self test in progress ... 49 percent complete
+
+** Processor - Dirty Cache Reads Test **
+Test Started : 10:56:34
+Running Processor Dirty Cache Reads Test - 33 % Complete
+Running Processor Dirty Cache Reads Test - 66 % Complete
+Running Processor Dirty Cache Reads Test - 100 % Complete
+Test Ended : 10:56:36
+Test Result: Success
+Elapsed Time: 00:00:02
+
+** Processor - Alternating CPU Writes Test **
+Test Started : 10:56:36
+Running Processor Alternating CPU Writes Test - 50 % Complete
+Running Processor Alternating CPU Writes Test - 100 % Complete
+Test Ended : 10:56:36
+Test Result: Success
+Elapsed Time: 00:00:00
+
+** Processor - Random Access Thrash Test **
+Test Started : 10:56:36
+Running Processor Random Access Thrash Test - 20 % Complete
+Running Processor Random Access Thrash Test - 40 % Complete
+Running Processor Random Access Thrash Test - 60 % Complete
+Running Processor Random Access Thrash Test - 80 % Complete
+Running Processor Random Access Thrash Test - 100 % Complete
+Test Ended : 10:56:38
+Test Result: Success
+Elapsed Time: 00:00:02
+
+** Processor - Stress Test **
+Test Started : 10:56:38
+Running Processor Stress Test - 21 % Complete
+Running Processor Stress Test - 41 % Complete
+Running Processor Stress Test - 61 % Complete
+Running Processor Stress Test - 81 % Complete
+Running Processor Stress Test - 100 % Complete
+Test Ended : 10:56:52
+Test Result: Success
+Elapsed Time: 00:00:14
+
+** Disk 1 - Basic Test (Short DST) **
+Test Ended : 10:56:52
+Test Result: Success
+Elapsed Time: 00:00:33
+
+** Memory - Data Bus Stress Test **
+Test Started : 10:56:52
+Running Memory Test Data Bus Stress Test - Percent Complete 0
+
+** System Management - Functional Test **
+Test Started : 10:56:53
+ Sensor Name         =CPU
+ Sensor MaxTemp      =52
+ Sensor MiniTemp     =38
+ Sensor CurrentTemp  =52
+ Sensor Name         =SKIN
+ Sensor MaxTemp      =28
+ Sensor MiniTemp     =22
+ Sensor CurrentTemp  =28
+ Sensor Name         =DIMM A
+ Sensor MaxTemp      =31
+ Sensor MiniTemp     =23
+ Sensor CurrentTemp  =31
+ Sensor Name         =SKIN
+ Sensor MaxTemp      =34
+ Sensor MiniTemp     =26
+ Sensor CurrentTemp  =34
+ Sensor Name         =SKIN
+ Sensor MaxTemp      =32
+ Sensor MiniTemp     =25
+ Sensor CurrentTemp  =32
+ Sensor Name         =SKIN
+ Sensor MaxTemp      =21
+ Sensor MiniTemp     =20
+ Sensor CurrentTemp  =21
+Test Ended : 10:56:55
+Test Result: Success
+Elapsed Time: 00:00:02
+Running Memory Test Data Bus Stress Test - Percent Complete 2
+Running Memory Test Data Bus Stress Test - Percent Complete 4
+Running Memory Test Data Bus Stress Test - Percent Complete 6
+Running Memory Test Data Bus Stress Test - Percent Complete 8
+Running Memory Test Data Bus Stress Test - Percent Complete 10
+Running Memory Test Data Bus Stress Test - Percent Complete 12
+Running Memory Test Data Bus Stress Test - Percent Complete 14
+Running Memory Test Data Bus Stress Test - Percent Complete 16
+Running Memory Test Data Bus Stress Test - Percent Complete 19
+Running Memory Test Data Bus Stress Test - Percent Complete 20
+Running Memory Test Data Bus Stress Test - Percent Complete 22
+Running Memory Test Data Bus Stress Test - Percent Complete 24
+Running Memory Test Data Bus Stress Test - Percent Complete 26
+Running Memory Test Data Bus Stress Test - Percent Complete 28
+Running Memory Test Data Bus Stress Test - Percent Complete 30
+Running Memory Test Data Bus Stress Test - Percent Complete 32
+Running Memory Test Data Bus Stress Test - Percent Complete 34
+Running Memory Test Data Bus Stress Test - Percent Complete 37
+Running Memory Test Data Bus Stress Test - Percent Complete 38
+Running Memory Test Data Bus Stress Test - Percent Complete 40
+Running Memory Test Data Bus Stress Test - Percent Complete 42
+Running Memory Test Data Bus Stress Test - Percent Complete 44
+Running Memory Test Data Bus Stress Test - Percent Complete 46
+Running Memory Test Data Bus Stress Test - Percent Complete 48
+Running Memory Test Data Bus Stress Test - Percent Complete 50
+Running Memory Test Data Bus Stress Test - Percent Complete 52
+Running Memory Test Data Bus Stress Test - Percent Complete 54
+Running Memory Test Data Bus Stress Test - Percent Complete 56
+Running Memory Test Data Bus Stress Test - Percent Complete 58
+Running Memory Test Data Bus Stress Test - Percent Complete 60
+Running Memory Test Data Bus Stress Test - Percent Complete 62
+Running Memory Test Data Bus Stress Test - Percent Complete 64
+Running Memory Test Data Bus Stress Test - Percent Complete 66
+Running Memory Test Data Bus Stress Test - Percent Complete 68
+Running Memory Test Data Bus Stress Test - Percent Complete 70
+Running Memory Test Data Bus Stress Test - Percent Complete 72
+Running Memory Test Data Bus Stress Test - Percent Complete 74
+Running Memory Test Data Bus Stress Test - Percent Complete 76
+Running Memory Test Data Bus Stress Test - Percent Complete 78
+Running Memory Test Data Bus Stress Test - Percent Complete 80
+Running Memory Test Data Bus Stress Test - Percent Complete 82
+Running Memory Test Data Bus Stress Test - Percent Complete 84
+Running Memory Test Data Bus Stress Test - Percent Complete 86
+Running Memory Test Data Bus Stress Test - Percent Complete 89
+Running Memory Test Data Bus Stress Test - Percent Complete 90
+Running Memory Test Data Bus Stress Test - Percent Complete 92
+Running Memory Test Data Bus Stress Test - Percent Complete 94
+Running Memory Test Data Bus Stress Test - Percent Complete 96
+Running Memory Test Data Bus Stress Test - Percent Complete 98
+
+** Memory - Data Bus Stress Test **
+Test Ended : 10:57:45
+Test Result: Success
+Elapsed Time: 00:00:53
+
+** Memory - WCMATS Test **
+Test Started : 10:57:45
+Running Memory Test WCMATS Test - Percent Complete 0
+Running Memory Test WCMATS Test - Percent Complete 2
+Running Memory Test WCMATS Test - Percent Complete 4
+Running Memory Test WCMATS Test - Percent Complete 6
+Running Memory Test WCMATS Test - Percent Complete 8
+Running Memory Test WCMATS Test - Percent Complete 10
+Running Memory Test WCMATS Test - Percent Complete 12
+Running Memory Test WCMATS Test - Percent Complete 14
+Running Memory Test WCMATS Test - Percent Complete 16
+Running Memory Test WCMATS Test - Percent Complete 18
+Running Memory Test WCMATS Test - Percent Complete 20
+Running Memory Test WCMATS Test - Percent Complete 22
+Running Memory Test WCMATS Test - Percent Complete 25
+Running Memory Test WCMATS Test - Percent Complete 26
+Running Memory Test WCMATS Test - Percent Complete 28
+Running Memory Test WCMATS Test - Percent Complete 30
+Running Memory Test WCMATS Test - Percent Complete 32
+Running Memory Test WCMATS Test - Percent Complete 34
+Running Memory Test WCMATS Test - Percent Complete 36
+Running Memory Test WCMATS Test - Percent Complete 38
+Running Memory Test WCMATS Test - Percent Complete 40
+Running Memory Test WCMATS Test - Percent Complete 42
+Running Memory Test WCMATS Test - Percent Complete 44
+Running Memory Test WCMATS Test - Percent Complete 47
+Running Memory Test WCMATS Test - Percent Complete 48
+Running Memory Test WCMATS Test - Percent Complete 50
+Running Memory Test WCMATS Test - Percent Complete 52
+Running Memory Test WCMATS Test - Percent Complete 54
+Running Memory Test WCMATS Test - Percent Complete 56
+Running Memory Test WCMATS Test - Percent Complete 58
+Running Memory Test WCMATS Test - Percent Complete 60
+Running Memory Test WCMATS Test - Percent Complete 62
+Running Memory Test WCMATS Test - Percent Complete 64
+Running Memory Test WCMATS Test - Percent Complete 66
+Running Memory Test WCMATS Test - Percent Complete 68
+Running Memory Test WCMATS Test - Percent Complete 70
+Running Memory Test WCMATS Test - Percent Complete 72
+Running Memory Test WCMATS Test - Percent Complete 74
+Running Memory Test WCMATS Test - Percent Complete 76
+Running Memory Test WCMATS Test - Percent Complete 78
+Running Memory Test WCMATS Test - Percent Complete 81
+Running Memory Test WCMATS Test - Percent Complete 82
+Running Memory Test WCMATS Test - Percent Complete 84
+Running Memory Test WCMATS Test - Percent Complete 86
+Running Memory Test WCMATS Test - Percent Complete 88
+Running Memory Test WCMATS Test - Percent Complete 90
+Running Memory Test WCMATS Test - Percent Complete 92
+Running Memory Test WCMATS Test - Percent Complete 94
+Running Memory Test WCMATS Test - Percent Complete 96
+Running Memory Test WCMATS Test - Percent Complete 98
+
+** Memory - WCMATS Test **
+Test Ended : 11:02:19
+Test Result: Success
+Elapsed Time: 00:04:34
+==================================================07/12/2024 11:02==================================================
