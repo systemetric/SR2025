@@ -10,7 +10,7 @@ class MyRobot:
     COUNTS_PER_REVOL = 2720
     REVOL_DIST = 0.392 #m
     ACCURACY = 100
-    P, I, D = [1, 0.5, 0.5]
+    P, I, D = [1, 0, 1]
     ARDUINO_SERIAL = "7523031383335161A231"
     BAUD = 115200
     ROBOT = None
@@ -29,6 +29,17 @@ class MyRobot:
 
     def __del__(self):
         self.DEBUGGER.stop()
+
+    def stop(self):
+        self.MB.motors[0].power = 0
+        self.MB.motors[1].power = 0
+
+    def setReached(self, motors = [0,1]):
+        if 0 in motors:
+            self.MB.motors[0].power = 0
+        if 1 in motors:
+            self.MB.motors[1].power = 0
+        pass
 
     def powerByCount(self, pCount, pidObject):
         return pidObject(pCount) 
@@ -49,10 +60,11 @@ class MyRobot:
         self.ROBOT.arduino.command("c")
         initialTime = time.time()
 
-        reached = False
+        m0reached = False
+        m1reached = False
 
         message = ""
-        while not reached:
+        while not m0reached and not m1reached:
 
             receivedData = self.ROBOT.arduino.command("m")
             message += f"[{time.time() - initialTime}]\n"
@@ -63,17 +75,23 @@ class MyRobot:
             message += f"Received Data: '{receivedData}'\n"
 
             m0Count, m1Count = list(map(int, receivedData[:-1].split(";")))
-            if 0 in self.TARGET_MOTORS:
+            if 0 in self.TARGET_MOTORS and not m0reached:
                 self.MB.motors[0].power = (m0Power := self.powerByCount(m0Count, m0PID))
                 message += f"M0: Count: {m0Count}, power: {m0Power}\n"
-                reached = abs(targetCount - m0Count) < self.ACCURACY
+                m0reached = abs(targetCount - m0Count) < self.ACCURACY
+                if m0reached:
+                    message += "Stopped M0\n"
+                    self.stop(motors=[0])
 
-
-            if  1 in self.TARGET_MOTORS:
+            if  1 in self.TARGET_MOTORS and not m1reached:
                 self.MB.motors[1].power = (m1Power := self.powerByCount(m1Count, m1PID))
                 message += f"M1: Count: {m1Count}, power: {m1Power}\n"
-                reached = abs(targetCount - m1Count) < self.ACCURACY
+                m1reached = abs(targetCount - m1Count) < self.ACCURACY
+                if m1reached:
+                    message += "Stopped M1\n"
+                    self.stop(motors=[1])
 
+        self.stop()
         self.DEBUGGER.debug(message)
 
     def RobotRotate(self, pAngle):
