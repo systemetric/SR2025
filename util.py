@@ -1,36 +1,36 @@
 from datetime import datetime
         
 class MyRobotDebug:
-    DEBUG_FILE = None
-    DEBUG = True
-    DEBUG_PASS_THROUGH = False
+    __DEBUG_FILE = None
+    __DEBUG = True
+    __DEBUG_PASS_THROUGH = False
 
     def __init__(self, enable = True, passThrough = False):
-        self.DEBUG = enable
-        self.DEBUG_PASS_THROUGH = passThrough
+        self.__DEBUG = enable
+        self.__DEBUG_PASS_THROUGH = passThrough
         thisTime = datetime.now()
         thisTimeFmt = thisTime.strftime("%d.%m.%Y_%H.%M.%S")
-        self.DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")
+        self.__DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")
 
     def __del__(self):
         self.stop()
 
     def setEnabled(self, enabled):
-        self.DEBUG = enabled
+        self.__DEBUG = enabled
 
     def setPassThrough(self, passThrough):
-        self.DEBUG_PASS_THROUGH = passThrough
+        self.__DEBUG_PASS_THROUGH = passThrough
 
     def stop(self):
-        self.DEBUG_FILE.close()
+        self.__DEBUG_FILE.close()
 
     def debug(self, *args, end="\n"):
-        if self.DEBUG:
+        if self.__DEBUG:
             for s in args:
-                self.DEBUG_FILE.write(s)
-                if self.DEBUG_PASS_THROUGH:
+                self.__DEBUG_FILE.write(s)
+                if self.__DEBUG_PASS_THROUGH:
                     print(s, end="")
-            self.DEBUG_FILE.write(end)
-            self.DEBUG_FILE.flush()
-            if self.DEBUG_PASS_THROUGH:
+            self.__DEBUG_FILE.write(end)
+            self.__DEBUG_FILE.flush()
+            if self.__DEBUG_PASS_THROUGH:
                 print(end, end="")
