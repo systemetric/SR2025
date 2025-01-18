@@ -107,14 +107,14 @@ class MyRobot:
 
     def reverse(self, distance):
         self.TARGET_MOTORS = [0, 1]
-        self.REVERSE = [1,1]
+        self.REVERSE = [1, 1]
         self.RobotDrive(-distance)
 
     def right(self, angle, isRadians = False):
     #    self.TARGET_MOTORS = [1]
         self.REVERSE = [-1, 1]
         if isRadians:
-            self.RobotRotate(angle * (math.pi / 180))
+            self.RobotRotate(angle * (180 / math.pi))
         else:
             self.RobotRotate(angle)
 
@@ -122,6 +122,6 @@ class MyRobot:
    #     self.TARGET_MOTORS = [0]
         self.REVERSE = [1, -1]
         if isRadians:
-            self.RobotRotate(angle * (math.pi / 180))
+            self.RobotRotate(angle * (180 / math.pi))
         else:
             self.RobotRotate(angle)
