@@ -137,7 +137,7 @@ class MyRobot:
     def __RobotRotate(self, pAngle):
         arcRadius = 0.425 #m
         halfArc = arcRadius * math.pi #m
-        ROTATIONAL_CONSTANT = 1.0925
+        ROTATIONAL_CONSTANT = 1.75
         self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * ROTATIONAL_CONSTANT)
 
     def forward(self, distance):

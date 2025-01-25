@@ -8,15 +8,22 @@ class MyRobotDebug:
     def __init__(self, enable = True, passThrough = False):
         self.__DEBUG = enable
         self.__DEBUG_PASS_THROUGH = passThrough
-        thisTime = datetime.now()
-        thisTimeFmt = thisTime.strftime("%d.%m.%Y_%H.%M.%S")
-        self.__DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")
+        
+        if enable:
+            thisTime = datetime.now()
+            thisTimeFmt = thisTime.strftime("%d.%m.%Y_%H.%M.%S")
+            self.__DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")
 
     def __del__(self):
         self.stop()
 
     def setEnabled(self, enabled):
         self.__DEBUG = enabled
+
+        if self.__DEBUG_FILE == None:
+            thisTime = datetime.now()
+            thisTimeFmt = thisTime.strftime("%d.%m.%Y_%H.%M.%S")
+            self.__DEBUG_FILE = open(f"log_{thisTimeFmt}.txt", "w")            
 
     def setPassThrough(self, passThrough):
         self.__DEBUG_PASS_THROUGH = passThrough
