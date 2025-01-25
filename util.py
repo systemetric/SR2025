@@ -27,10 +27,9 @@ class MyRobotDebug:
     def debug(self, *args, end="\n"):
         if self.__DEBUG:
             for s in args:
-                self.__DEBUG_FILE.write(s)
+                self.__DEBUG_FILE.write(str(s))
                 if self.__DEBUG_PASS_THROUGH:
-                    print(s, end="")
+                    print(str(s), end="")
             self.__DEBUG_FILE.write(end)
-            self.__DEBUG_FILE.flush()
             if self.__DEBUG_PASS_THROUGH:
                 print(end, end="")

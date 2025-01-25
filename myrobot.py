@@ -10,7 +10,8 @@ class MyRobot:
     __COUNTS_PER_REVOL = 2720
     __REVOL_DIST = 0.392 #m
     __ACCURACY = 30
-    __P, __I, __D = [1, 0, 1]
+    __P, __I, __D = [1, 0.05, 0.3]
+    #__P, __I, __D = [1, 1, 0.1]
     __ARDUINO_SERIAL = "7523031383335161A231"
     __BAUD = 115200
     __ROBOT = None
@@ -42,19 +43,40 @@ class MyRobot:
         pass
 
     def __powerByCount(self, pCount, pidObject):
-        return pidObject(pCount) 
-    
-    def __RobotDrive(self, pDistance):
+        return pidObject(pCount)
 
+    def __pidOverMotors(self, m0Count, m1Count):
+        m0Count, m1Count = list(map(abs,[m0Count, m1Count]))
+        pDelta = m0Count - m1Count
+        pSum = m0Count + m1Count
+        if abs(pDelta) < 25:
+            return 1, 1
+        factor = 1 if pSum == 0 else 1 - (abs(pDelta) ** 2) / pSum
+        if pDelta > 0:
+            return factor, 1
+        elif pDelta < 0:
+            return 1, factor
+        else:
+            return 1, 1
+        
+    def __clamp(self, pmin, x, pmax):
+        return max(min(x, pmax), pmin)
+
+    def __RobotDrive(self, pDistance):
         self.__DEBUGGER.debug(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
         #Calculate target
         targetCount = int(self.__COUNTS_PER_REVOL * pDistance / self.__REVOL_DIST)
+
+        self.__DEBUGGER.debug(f"Going to {targetCount}...\n")
 
         #Initialise PID objects
         m0PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[0])
         m0PID.output_limits = (-1,1)
         m1PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[1])
         m1PID.output_limits = (-1,1)
+
+        mXPID = PID(1, 0, 0, setpoint = 0)
+        mXPID.output_limits = (-1,1)
         
         #reset motor counts
         self.__ROBOT.arduino.command("c")
@@ -63,8 +85,13 @@ class MyRobot:
         m0reached = False
         m1reached = False
 
+        m0LastCount = 0
+        m1LastCount = 1
+
+        lastTime = initialTime
+
         message = ""
-        while not m0reached and not m1reached:
+        while not m0reached or not m1reached:
 
             receivedData = self.__ROBOT.arduino.command("m")
             message += f"[{time.time() - initialTime}]\n"
@@ -75,30 +102,43 @@ class MyRobot:
             message += f"Received Data: '{receivedData}'\n"
 
             m0Count, m1Count = list(map(int, receivedData[:-1].split(";")))
+
+            factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
+            message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
+
+       #     self.__DEBUGGER.debug(f"{time.time()},{m0Count},{m1Count}")
+
             if 0 in self.__TARGET_MOTORS and not m0reached:
-                self.__MB.motors[0].power = (m0Power := self.__powerByCount(m0Count, m0PID))
+                self.__MB.motors[0].power = (m0Power := self.__clamp(-1, factorM0 * self.__powerByCount(m0Count, m0PID), 1))
                 message += f"M0: Count: {m0Count}, power: {m0Power}\n"
-                m0reached = abs(targetCount - m0Count) < self.__ACCURACY
+                m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY
+                self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
                 if m0reached:
                     message += "Stopped M0\n"
                     self.__setReached(motors=[0])
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
-                self.__MB.motors[1].power = (m1Power := self.__powerByCount(m1Count, m1PID))
+                self.__MB.motors[1].power = (m1Power := self.__clamp(-1, factorM1 * self.__powerByCount(m1Count, m1PID), 1))
                 message += f"M1: Count: {m1Count}, power: {m1Power}\n"
-                m1reached = abs(targetCount - m1Count) < self.__ACCURACY
+                m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY
+                self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
 
+            m0LastCount= m0Count
+            m1LastCount = m1Count
+            self.__DEBUGGER.debug(message)
+            message = ""
+
         self.stop()
-        self.__DEBUGGER.debug(message)
+        time.sleep(.5)
 
     def __RobotRotate(self, pAngle):
         arcRadius = 0.425 #m
         halfArc = arcRadius * math.pi #m
-
-        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5)
+        ROTATIONAL_CONSTANT = 1.0925
+        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * ROTATIONAL_CONSTANT)
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
