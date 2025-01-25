@@ -14,7 +14,7 @@ class MyRobot:
     #__P, __I, __D = [1, 1, 0.1]
     __ARDUINO_SERIAL = "7523031383335161A231"
     __BAUD = 115200
-    __ROBOT = None
+    ROBOT = None
     __MB = None
     __DEBUGGER = None
 
@@ -23,8 +23,8 @@ class MyRobot:
         self.__TARGET_MOTORS = targetMotors
         self.__ACCURACY = accuracy
 
-        self.__ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)])
-        self.__MB = self.__ROBOT.motor_board
+        self.ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)])
+        self.__MB = self.ROBOT.motor_board
 
         self.__DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
 
@@ -79,7 +79,7 @@ class MyRobot:
         mXPID.output_limits = (-1,1)
         
         #reset motor counts
-        self.__ROBOT.arduino.command("c")
+        self.ROBOT.arduino.command("c")
         initialTime = time.time()
 
         m0reached = False
@@ -93,7 +93,7 @@ class MyRobot:
         message = ""
         while not m0reached or not m1reached:
 
-            receivedData = self.__ROBOT.arduino.command("m")
+            receivedData = self.ROBOT.arduino.command("m")
             message += f"[{time.time() - initialTime}]\n"
             if receivedData[-1] != '|':    
                 message += f"Bad message received \"{receivedData}\"\n"
@@ -137,8 +137,8 @@ class MyRobot:
     def __RobotRotate(self, pAngle):
         arcRadius = 0.425 #m
         halfArc = arcRadius * math.pi #m
-        ROTATIONAL_CONSTANT = 1.75
-        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * ROTATIONAL_CONSTANT)
+        SPECIAL_K = 1.4
+        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_K)
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
