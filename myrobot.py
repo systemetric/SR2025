@@ -15,8 +15,10 @@ class MyRobot:
     __ARDUINO_SERIAL = "7523031383335161A231"
     __BAUD = 115200
     ROBOT = None
-    __MB = None
+    __MOTOR_MB = None
+    __PUMP_MB = None
     __DEBUGGER = None
+    __LAC_MOVE_TIMES = [9, 8]
 
     def __init__(self, window=200, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
         self.__REVOL_DIST = revolDist
@@ -24,22 +26,25 @@ class MyRobot:
         self.__ACCURACY = accuracy
 
         self.ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)])
-        self.__MB = self.ROBOT.motor_board
+        self.__MOTOR_MB = self.ROBOT.motor_boards["SR0UK1L"]
+        self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
         self.__DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
+        
+        self.scissor_down()
 
     def __del__(self):
         self.__DEBUGGER.stop()
 
     def stop(self):
-        self.__MB.motors[0].power = 0
-        self.__MB.motors[1].power = 0
+        self.__MOTOR_MB.motors[0].power = 0
+        self.__MOTOR_MB.motors[1].power = 0
 
     def __setReached(self, motors = [0,1]):
         if 0 in motors:
-            self.__MB.motors[0].power = 0
+            self.__MOTOR_MB.motors[0].power = 0
         if 1 in motors:
-            self.__MB.motors[1].power = 0
+            self.__MOTOR_MB.motors[1].power = 0
         pass
 
     def __powerByCount(self, pCount, pidObject):
@@ -123,7 +128,7 @@ class MyRobot:
        #     self.__DEBUGGER.debug(f"{time.time()},{m0Count},{m1Count}")
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
-                self.__MB.motors[0].power = (m0Power := self.__clamp(-1, factorM0 * self.__powerByCount(m0Count, m0PID), 1))
+                self.__MOTOR_MB.motors[0].power = (m0Power := self.__clamp(-1, factorM0 * self.__powerByCount(m0Count, m0PID), 1))
                 message += f"M0: Count: {m0Count}, power: {m0Power}\n"
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
                 self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
@@ -132,7 +137,7 @@ class MyRobot:
                     self.__setReached(motors=[0])
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
-                self.__MB.motors[1].power = (m1Power := self.__clamp(-1, factorM1 * self.__powerByCount(m1Count, m1PID), 1))
+                self.__MOTOR_MB.motors[1].power = (m1Power := self.__clamp(-1, factorM1 * self.__powerByCount(m1Count, m1PID), 1))
                 message += f"M1: Count: {m1Count}, power: {m1Power}\n"
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
                 self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
@@ -146,13 +151,37 @@ class MyRobot:
             message = ""
 
         self.stop()
-        time.sleep(.5)
+        self.ROBOT.sleep(.5)
 
     def __RobotRotate(self, pAngle):
         arcRadius = 0.425 #m
         halfArc = arcRadius * math.pi #m
         SPECIAL_κ = 1.0087125
         self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ)
+        
+    def __setLacState(self, v):
+        self.__PUMP_MB.motors[1].power = v
+    
+    def __getLacState(self):
+        return self.__PUMP_MB.motors[1].power
+
+    @property
+    def pump(self):
+        return self.__PUMP_MB.motors[0].power != 0
+    
+    @pump.setter
+    def pump(self, enabled):
+        self.__PUMP_MB.motors[0].power = -1 if enabled else 0
+    
+    def scissor_up(self, dur=__LAC_MOVE_TIMES[0]):
+        self.__setLacState(1)
+        self.ROBOT.sleep(dur)
+        self.__setLacState(0)
+        
+    def scissor_down(self, dur=__LAC_MOVE_TIMES[1]):
+        self.__setLacState(-1)
+        self.ROBOT.sleep(dur)
+        self.__setLacState(0)
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
@@ -179,3 +208,14 @@ class MyRobot:
             self.__RobotRotate(angle * (180 / math.pi))
         else:
             self.__RobotRotate(angle)
+    
+    def beep(self, hz=440, dur=0.1):
+        self.ROBOT.power_board.piezo.buzz(hz, dur)
+    
+    def beep_sync(self, hz=440, dur=0.1, timeout=0):
+        self.ROBOT.power_board.piezo.buzz(hz, dur, blocking=True)
+        if timeout > 0:
+            self.ROBOT.sleep(timeout)
+    
+    def sleep(self, length):
+        self.ROBOT.sleep(length)
