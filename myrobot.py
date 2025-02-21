@@ -30,7 +30,7 @@ class MyRobot:
 
         self.__DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
         
-        self.scissor_down()
+        self.scissor_up()
 
     def __del__(self):
         self.__DEBUGGER.stop()
@@ -212,6 +212,20 @@ class MyRobot:
             self.__RobotRotate(angle * (180 / math.pi))
         else:
             self.__RobotRotate(angle)
+    
+    def grab(self):
+        self.pump = True
+        self.scissor_down()
+        self.sleep(1)
+        self.scissor_up()
+    
+    def drop(self):
+        self.pump = False
+    
+    def place(self):
+        self.scissor_down()
+        self.pump = False
+        self.scissor_up()
     
     def beep(self, hz=440, dur=0.1):
         self.ROBOT.power_board.piezo.buzz(hz, dur)

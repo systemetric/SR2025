@@ -9,7 +9,9 @@ tests_to_run = [
     # "lac_up_down",
     # "lac_time_up_down",
     # "pump_on_off",
-    "rickroll",
+    "full_scissor_test",
+    # "rickroll",
+    # "motor_challenge",
 ]
 
 if TESTING:
