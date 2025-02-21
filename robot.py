@@ -1,7 +1,6 @@
 from myrobot import *
 import sys
 import unittest
-import tests
 
 TESTING = True
 tests_to_run = [
@@ -14,7 +13,9 @@ tests_to_run = [
 ]
 
 if TESTING:
+    import tests #Avoid double robot declaration by importing here
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
+    # unittest.main exists after completion
 
 robot = MyRobot(accuracy=10, dbgEnabled=True)
 
