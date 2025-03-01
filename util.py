@@ -14,7 +14,7 @@ class MyRobotDebug:
     def __del__(self):
         self.stop()
 
-    def __getNewLogFileName():
+    def __getNewLogFileName(self):
         # Get log file name based on last. 'logXX.txt'
         logFiles = [f for f in os.listdir('.') if (f.endswith('.txt') and f.startswith('log'))]
         logFiles.sort()
@@ -25,7 +25,7 @@ class MyRobotDebug:
         if len(logFiles) > 0:
             n = int(list(map(int, re.findall("\d+",logFiles[len(logFiles) - 1])))[0]) + 1
 
-        return f"log{n}.txt";
+        return f"log{n}.txt"
     
 
     def setEnabled(self, enabled):

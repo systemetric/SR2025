@@ -4,12 +4,12 @@ import unittest
 
 TESTING = True
 tests_to_run = [
-    # "drive_back_forwards",
+    "drive_back_forwards",
     # "drive_right_triangle",
     # "lac_up_down",
     # "lac_time_up_down",
     # "pump_on_off",
-    "full_scissor_test",
+    # "full_scissor_test",
     # "rickroll",
     # "motor_challenge",
 ]
