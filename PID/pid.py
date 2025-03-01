@@ -1,3 +1,5 @@
+# This file is not used, and can be safely removed
+
 import time
 import matplotlib.pyplot as plt
 
