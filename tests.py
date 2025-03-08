@@ -97,6 +97,21 @@ class TestRobot(unittest.TestCase):
         robot.forward(1)
         robot.drop()
         robot.right(180)
+    
+    def play_fetch(self):
+        print("Playing fetch")
+        while True:
+            robot.forward(1)
+            robot.grab()
+            robot.right(180)
+            robot.forward(1)
+            robot.drop()
+            robot.right(180)
+
+            robot.forward(1)
+            robot.right(180)
+            robot.forward(1)
+            robot.right(180)
         
     def rickroll(self):
         robot.beep_sync(262, 0.15, 0.05) #C
@@ -125,12 +140,12 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(294, 0.15, 0.05) #D
         robot.beep_sync(262, 0.15, 0.05) #C
         
-        
-        
-        
-        
-    
-    
+    def pump_toggler(self):
+        for _ in range(10):
+            robot.pump = True
+            robot.sleep(3)
+            robot.pump = False
+            robot.sleep(2)
 
 if __name__ == '__main__':
     unittest.main()

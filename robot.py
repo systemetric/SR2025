@@ -11,10 +11,12 @@ tests_to_run = [
     # "pump_on_off",
     # "stand_and_deliver",
     # "full_scissor_test",
-    "pump_read_current",
+    # "pump_read_current",
     # "scissor_read_current",
     # "rickroll",
     # "motor_challenge",
+    "play_fetch",
+    # "pump_toggler"
 ]
 
 if TESTING:

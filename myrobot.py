@@ -186,6 +186,7 @@ class MyRobot:
         self.__PUMP_MB.motors[0].power = -1 if enabled else 0
     
     def scissor_up(self, dur=-1):
+        print("Scissor going up...")
         self.__setLacState(1)
         if dur >= 0:
             self.sleep(dur)
@@ -193,8 +194,10 @@ class MyRobot:
             while self.__getLacCurrentDraw() < 0.2:
                 self.sleep(0.1)
         self.__setLacState(0)
+        print("Scissor is up.")
         
     def scissor_down(self, dur=-1):
+        print("Scissor going down...")
         self.__setLacState(-1)
         if dur >= 0:
             self.sleep(dur)
@@ -202,6 +205,7 @@ class MyRobot:
             while self.__getLacCurrentDraw() < 0.2:
                 self.sleep(0.1)
         self.__setLacState(0)
+        print("Scissor down.")
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
