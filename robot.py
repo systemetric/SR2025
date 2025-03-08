@@ -2,6 +2,9 @@ from myrobot import *
 import sys
 import unittest
 
+# Uncomment the test you want to run.
+# Tests are defined as functions in tests.py
+
 TESTING = True
 tests_to_run = [
     # "drive_back_forwards",
