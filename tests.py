@@ -1,6 +1,7 @@
 import unittest
 import time
 from myrobot import *
+from camera import *
 
 robot = MyRobot(accuracy=10, dbgEnabled=True)
 
@@ -129,7 +130,6 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(392, 0.55, 0.05) #G
         robot.beep_sync(392, 0.55, 0.05) #G
         robot.beep_sync(349, 1.1,0.1) #F
-        
         robot.beep_sync(262, 0.15, 0.05) #C
         robot.beep_sync(294, 0.15, 0.05) #D
         robot.beep_sync(349, 0.15, 0.05) #F
@@ -146,6 +146,23 @@ class TestRobot(unittest.TestCase):
             robot.sleep(3)
             robot.pump = False
             robot.sleep(2)
+    
+    def navigate_to_cube(self):
+        mrc = MyRobotCamera(robot)
+
+        for i in range(36):
+            robot.right(20)
+            m = mrc.find_pallet_markers()
+
+            if len(m) > 0:
+                print(f"{i}:")
+                for mx in m:
+                    print(f"    ID = {mx.id}    Distance = {mx.position.distance}    Angle = {mx.position.horizontal_angle}")
+
+                closest = m[0]
+                robot.right(closest.position.horizontal_angle, isRadians=True)
+                robot.forward((closest.position.distance) / 1000)
+                robot.grab()
 
 if __name__ == '__main__':
     unittest.main()

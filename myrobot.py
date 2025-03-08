@@ -16,7 +16,7 @@ class MyRobot:
     ROBOT = None
     __MOTOR_MB = None
     __PUMP_MB = None
-    __DEBUGGER = None
+    DEBUGGER = None
     __LAC_MOVE_TIMES = [9, 8]
 
     def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
@@ -28,12 +28,12 @@ class MyRobot:
         self.__MOTOR_MB = self.ROBOT.motor_boards["SR0UK1L"]
         self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
-        self.__DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
+        self.DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
         
         self.scissor_up()
 
     def __del__(self):
-        self.__DEBUGGER.stop()
+        self.DEBUGGER.stop()
 
     def stop(self):
         self.__MOTOR_MB.motors[0].power = 0
@@ -70,12 +70,12 @@ class MyRobot:
         return max(min(x, pmax), pmin)
 
     def __RobotDrive(self, pDistance):
-        self.__DEBUGGER.debug(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
+        self.DEBUGGER.debug(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
         
         # Calculate target
         targetCount = int(self.__COUNTS_PER_REVOL * pDistance / self.__REVOL_DIST)
 
-        self.__DEBUGGER.debug(f"Going to {targetCount}...\n")
+        self.DEBUGGER.debug(f"Going to {targetCount}...\n")
 
         # Initialise PID objects
         m0PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[0])
@@ -134,7 +134,7 @@ class MyRobot:
 
                 # Within range and slow enough to stop?
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
-                self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
+                self.DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
                 if m0reached:
                     message += "Stopped M0\n"
                     self.__setReached(motors=[0])
@@ -146,18 +146,18 @@ class MyRobot:
 
                 # Within range and slow enough to stop?
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
-                self.__DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
+                self.DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
 
             m0LastCount= m0Count
             m1LastCount = m1Count
-            self.__DEBUGGER.debug(message)
+            self.DEBUGGER.debug(message)
             message = ""
 
         self.stop()
-        self.ROBOT.sleep(.5)
+     #   self.ROBOT.sleep(.5)
 
     def __RobotRotate(self, pAngle):
         arcRadius = 0.425 # m
@@ -255,3 +255,6 @@ class MyRobot:
     
     def sleep(self, length):
         self.ROBOT.sleep(length)
+
+    def see_and_capture(self, f):
+        return self.ROBOT.camera.see(save=f)
