@@ -72,6 +72,31 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(440, 0.15, 0.05)
         robot.sleep(0.4)
         robot.drop()
+    
+    # WILL CRASH
+    def scissor_read_current(self):
+        robot.d__setLacState(-1)
+        print("time, current")
+        for i in range(200):
+            print(f"{i*0.1}, {robot.pumpmb().motors[1].current}")
+            robot.sleep(0.1)
+        robot.d__setLacState(0)
+        
+    def pump_read_current(self):
+        robot.pump = True
+        print("time, current")
+        for i in range(300):
+            print(f"{i*0.1}, {robot.getPUMP_MB().motors[0].current}")
+            robot.sleep(0.1)
+        robot.pump = False
+    
+    def stand_and_deliver(self):
+        robot.forward(1)
+        robot.grab()
+        robot.right(180)
+        robot.forward(1)
+        robot.drop()
+        robot.right(180)
         
     def rickroll(self):
         robot.beep_sync(262, 0.15, 0.05) #C
@@ -82,13 +107,24 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(440, 0.55, 0.05) #A
         robot.beep_sync(392, 1.1,0.1) #G
         
-        robot.beep_sync(262, 0.2) #C
-        robot.beep_sync(294, 0.2) #D
-        robot.beep_sync(349, 0.2) #F
-        robot.beep_sync(294, 0.2) #D
+        robot.beep_sync(262, 0.15, 0.05) #C
+        robot.beep_sync(294, 0.15, 0.05) #D
+        robot.beep_sync(349, 0.15, 0.05) #F
+        robot.beep_sync(294, 0.15, 0.05) #D
         robot.beep_sync(392, 0.55, 0.05) #G
         robot.beep_sync(392, 0.55, 0.05) #G
         robot.beep_sync(349, 1.1,0.1) #F
+        
+        robot.beep_sync(262, 0.15, 0.05) #C
+        robot.beep_sync(294, 0.15, 0.05) #D
+        robot.beep_sync(349, 0.15, 0.05) #F
+        robot.beep_sync(294, 0.15, 0.05) #D
+        robot.beep_sync(349, 0.55, 0.05) #F
+        robot.beep_sync(392, 0.55, 0.05) #G
+        robot.beep_sync(312, 0.55,0.05) #Eish
+        robot.beep_sync(294, 0.15, 0.05) #D
+        robot.beep_sync(262, 0.15, 0.05) #C
+        
         
         
         

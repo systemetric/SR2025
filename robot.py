@@ -4,12 +4,15 @@ import unittest
 
 TESTING = True
 tests_to_run = [
-    "drive_back_forwards",
+    # "drive_back_forwards",
     # "drive_right_triangle",
     # "lac_up_down",
     # "lac_time_up_down",
     # "pump_on_off",
+    # "stand_and_deliver",
     # "full_scissor_test",
+    "pump_read_current",
+    # "scissor_read_current",
     # "rickroll",
     # "motor_challenge",
 ]
@@ -21,12 +24,5 @@ if TESTING:
 
 robot = MyRobot(accuracy=10, dbgEnabled=True)
 
-robot.__PUMP_MB.motors[1].power = 1
-robot.sleep(5)
-robot.__PUMP_MB.motors[1].power = 0
-robot.sleep(2)
-robot.__PUMP_MB.motors[1].power = -1
-robot.sleep(5)
-robot.__PUMP_MB.motors[1].power = 0
 
 sys.exit(0)

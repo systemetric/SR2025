@@ -170,7 +170,13 @@ class MyRobot:
     
     def __getLacState(self):
         return self.__PUMP_MB.motors[1].power
-
+    
+    def __getLacCurrentDraw(self):
+        return self.__PUMP_MB.motors[1].current
+    
+    def getPUMP_MB(self):
+        return self.__PUMP_MB
+    
     @property
     def pump(self):
         return self.__PUMP_MB.motors[0].power != 0
@@ -179,14 +185,22 @@ class MyRobot:
     def pump(self, enabled):
         self.__PUMP_MB.motors[0].power = -1 if enabled else 0
     
-    def scissor_up(self, dur=__LAC_MOVE_TIMES[0]):
+    def scissor_up(self, dur=-1):
         self.__setLacState(1)
-        self.ROBOT.sleep(dur)
+        if dur >= 0:
+            self.sleep(dur)
+        else:
+            while self.__getLacCurrentDraw() < 0.2:
+                self.sleep(0.1)
         self.__setLacState(0)
         
-    def scissor_down(self, dur=__LAC_MOVE_TIMES[1]):
+    def scissor_down(self, dur=-1):
         self.__setLacState(-1)
-        self.ROBOT.sleep(dur)
+        if dur >= 0:
+            self.sleep(dur)
+        else:
+            while self.__getLacCurrentDraw() < 0.2:
+                self.sleep(0.1)
         self.__setLacState(0)
 
     def forward(self, distance):
