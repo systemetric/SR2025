@@ -7,16 +7,16 @@ import unittest
 
 TESTING = True
 tests_to_run = [
-    # "drive_back_forwards",
+     #"drive_back_forwards",
     # "drive_back_forwards",
     #"drive_back_forwards",
     "navigate_to_cube",
-    # "drive_right_triangle",
+    #"drive_right_triangle",
     # "lac_up_down",
     # "lac_time_up_down",
     # "pump_on_off",
     # "stand_and_deliver",
-    # "full_scissor_test",
+    #"full_scissor_test",
     # "pump_read_current",
     # "scissor_read_current",
     # "rickroll",

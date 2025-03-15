@@ -3,8 +3,6 @@ import time
 from myrobot import *
 from camera import *
 
-# lac = Linear Actuator
-
 robot = MyRobot(accuracy=10, dbgEnabled=True)
 
 class TestRobot(unittest.TestCase):
@@ -23,20 +21,20 @@ class TestRobot(unittest.TestCase):
     def drive_back_forwards(self):
         """Drive forwards, turn around, drive backwards.
         """
-        robot.forward(1.5)
-        robot.right(180)
-        robot.forward(1.5)
-        robot.right(180)
+        robot.forward(3)
+       # robot.right(180)
+      #  robot.forward(3)
+       # robot.right(180)
 
     def drive_right_triangle(self):
         """Drive in a triangle, turns right each time.
         """
-        robot.forward(1.23)
-        robot.right(137)
-        robot.forward(1.4 * (2**0.5))
-        robot.right(137)
-        robot.forward(1.47)
-        robot.right(91)
+        robot.forward(1.5)
+        robot.right(145)
+        robot.forward(1.5 * (2**0.5))
+        robot.right(145)
+        robot.forward(1.5)
+        robot.right(90)
     
     def motor_challenge(self):
         """Drives in the right triangle three times.
@@ -171,12 +169,20 @@ class TestRobot(unittest.TestCase):
             robot.pump = False
             robot.sleep(2)
     
+    def dist_func(x):
+        k1 = 0.03026
+        k2 = 1.00968
+        k3 = 0.01906
+
+        return (((-k2) + math.sqrt(k2**2 - 4 * k3 * (k1 - x))) / (2 * k3)) - 0.1
+
     def navigate_to_cube(self):
         """Uses camera to locate a cube, drive to it and pick it up.
         """
         mrc = MyRobotCamera(robot)
 
-        for i in range(36):
+        for i in range(18):
+          #  robot.beep_sync(440, 0.55, 0.05)
             robot.right(20)
             m = mrc.find_pallet_markers()
 
@@ -187,8 +193,12 @@ class TestRobot(unittest.TestCase):
 
                 closest = m[0]
                 robot.right(closest.position.horizontal_angle, isRadians=True)
-                robot.forward((closest.position.distance) / 1000)
-                robot.grab()
+                robot.forward((closest.position.distance * 0.97) / 1000)
+           # robot.beep_sync(262, 0.15, 0.05)
+           # time.sleep(10)
+                robot.grab()  ## For testing
+        robot.DEBUGGER.debug("Finished nav test.")
+        
 
 if __name__ == '__main__':
     unittest.main()

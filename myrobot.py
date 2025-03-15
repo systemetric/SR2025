@@ -44,13 +44,12 @@ class MyRobot:
             self.__MOTOR_MB.motors[0].power = 0
         if 1 in motors:
             self.__MOTOR_MB.motors[1].power = 0
-        pass
 
     def __powerByCount(self, pCount, pidObject):
         return pidObject(pCount)
 
     def __pidOverMotors(self, m0Count, m1Count):
-        m0Count, m1Count = list(map(abs,[m0Count, m1Count]))
+        m0Count, m1Count = abs(m0Count), abs(m1Count)
         pDelta = m0Count - m1Count
         pSum = m0Count + m1Count
 
@@ -125,7 +124,7 @@ class MyRobot:
             factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
             message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
 
-       #     self.__DEBUGGER.debug(f"{time.time()},{m0Count},{m1Count}")
+            self.DEBUGGER.debug(f"{time.time()},{m0Count},{m1Count}")
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
                 # Get new power for M0
@@ -153,13 +152,14 @@ class MyRobot:
 
             m0LastCount= m0Count
             m1LastCount = m1Count
-            self.DEBUGGER.debug(message)
+        #    self.DEBUGGER.debug(message)
             message = ""
 
         self.stop()
      #   self.ROBOT.sleep(.5)
 
     def __RobotRotate(self, pAngle):
+        self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
         SPECIAL_κ = 1.0087125 ## DO NOT CHANGE!
