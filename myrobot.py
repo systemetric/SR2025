@@ -194,6 +194,9 @@ class MyRobot:
     def __getLacCurrentDraw(self):
         return self.__PUMP_MB.motors[1].current
     
+    def __getPumpCurrentDraw(self):
+        return self.__PUMP_MB.motors[0].current
+    
     def getPUMP_MB(self):
         return self.__PUMP_MB
     
@@ -205,13 +208,16 @@ class MyRobot:
     def pump(self, enabled):
         self.__PUMP_MB.motors[0].power = -1 if enabled else 0
     
+    DOWN_MARGIN = 0.04
+    UP_MARGIN = 0.2
+    
     def scissor_up(self, dur=-1):
         print("Scissor going up...")
         self.__setLacState(1)
         if dur >= 0:
             self.sleep(dur)
         else:
-            while self.__getLacCurrentDraw() < 0.2:
+            while self.__getLacCurrentDraw() <= self.UP_MARGIN:
                 self.sleep(0.1)
         self.__setLacState(0)
         print("Scissor is up.")
@@ -222,10 +228,22 @@ class MyRobot:
         if dur >= 0:
             self.sleep(dur)
         else:
-            while self.__getLacCurrentDraw() < 0.2:
+            times_checked = 0
+            while self.__getLacCurrentDraw() <= self.DOWN_MARGIN or times_checked < 4:
                 self.sleep(0.1)
+                times_checked+=1
         self.__setLacState(0)
         print("Scissor down.")
+    
+    def pump_grabbing_noise_based(self):
+        outliers = 0
+        for _ in range(5):
+            if self.__getPumpCurrentDraw() > 0.7:
+                outliers+=1
+            self.sleep(0.1)
+        print(outliers)
+        return outliers > 0
+            
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
