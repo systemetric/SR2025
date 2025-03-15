@@ -152,7 +152,7 @@ class MyRobot:
 
             m0LastCount= m0Count
             m1LastCount = m1Count
-        #    self.DEBUGGER.debug(message)
+            self.DEBUGGER.debug(message)
             message = ""
 
         self.stop()

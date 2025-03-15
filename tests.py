@@ -3,7 +3,7 @@ import time
 from myrobot import *
 from camera import *
 
-robot = MyRobot(accuracy=10, dbgEnabled=True)
+robot = MyRobot(accuracy=25, dbgEnabled=True)
 
 class TestRobot(unittest.TestCase):
     def setUp(self):
@@ -174,31 +174,47 @@ class TestRobot(unittest.TestCase):
         κ2 = 1.00968
         κ3 = 0.01906
 
-        return (((-κ2) + math.sqrt(κ2**2 - 4 * κ3 * (κ1 - x/1000))) / (2 * κ3)) - 0.1
+        return (((-κ2) + math.sqrt(κ2**2 - 4 * κ3 * (κ1 - x/1000))) / (2 * κ3))
+
+    def pick_up_cube(self, mrc, i, g):
+        for i in range(18):
+            robot.right(20)
+
+            m = []
+            if i == 0:
+                m = mrc.find_pallet_markers()
+            elif i == 1:
+                m = mrc.find_high_rise_markers()
+
+            if len(m) > 0:
+                for i in range(4):
+                    if i == 0:
+                        m = mrc.find_pallet_markers()
+                    elif i == 1:
+                        m = mrc.find_high_rise_markers()
+
+                    if len(m) > 0:
+                        print(f"{i}:")
+                        for mx in m:
+                            print(f"    ID = {mx.id}    Distance = {mx.position.distance}    Angle = {mx.position.horizontal_angle}")
+
+                        closest = m[0]
+                        robot.right(closest.position.horizontal_angle, isRadians=True)
+                        robot.forward(self.dist_func(closest.position.distance) / (4 - i))
+
+                if g == True:
+                    robot.grab()
+                else:
+                    robot.drop()
 
     def navigate_to_cube(self):
         """Uses camera to locate a cube, drive to it and pick it up.
         """
         mrc = MyRobotCamera(robot)
 
-        for i in range(18):
-          #  robot.beep_sync(440, 0.55, 0.05)
-            robot.right(20)
-            m = mrc.find_pallet_markers()
-
-            if len(m) > 0:
-                print(f"{i}:")
-                for mx in m:
-                    print(f"    ID = {mx.id}    Distance = {mx.position.distance}    Angle = {mx.position.horizontal_angle}")
-
-                closest = m[0]
-                robot.right(closest.position.horizontal_angle, isRadians=True)
-                robot.forward(self.dist_func(closest.position.distance))
-           # robot.beep_sync(262, 0.15, 0.05)
-           # time.sleep(10)
-                robot.grab()  ## For testing
-        robot.DEBUGGER.debug("Finished nav test.")
-        
+        while True:
+            self.pick_up_cube(mrc, 0, True)
+            self.pick_up_cube(mrc, 1, False)
 
 if __name__ == '__main__':
     unittest.main()
