@@ -169,12 +169,12 @@ class TestRobot(unittest.TestCase):
             robot.pump = False
             robot.sleep(2)
     
-    def dist_func(x):
-        k1 = 0.03026
-        k2 = 1.00968
-        k3 = 0.01906
+    def dist_func(self, x):
+        κ1 = 0.03026
+        κ2 = 1.00968
+        κ3 = 0.01906
 
-        return (((-k2) + math.sqrt(k2**2 - 4 * k3 * (k1 - x))) / (2 * k3)) - 0.1
+        return (((-κ2) + math.sqrt(κ2**2 - 4 * κ3 * (κ1 - x/1000))) / (2 * κ3)) - 0.1
 
     def navigate_to_cube(self):
         """Uses camera to locate a cube, drive to it and pick it up.
@@ -193,7 +193,7 @@ class TestRobot(unittest.TestCase):
 
                 closest = m[0]
                 robot.right(closest.position.horizontal_angle, isRadians=True)
-                robot.forward((closest.position.distance * 0.97) / 1000)
+                robot.forward(self.dist_func(closest.position.distance))
            # robot.beep_sync(262, 0.15, 0.05)
            # time.sleep(10)
                 robot.grab()  ## For testing
