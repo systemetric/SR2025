@@ -10,13 +10,13 @@ class MyRobotCamera:
         self.ROBOT = robot
         self.__NEXT_OBJ = self.__MARKER_PALLET
 
-    def find_pallet_markers(self):
+    def find_pallet_markers(self, ignored_markers:list = []):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
         markers = self.ROBOT.ROBOT.camera.see()
 
         palletMarkers = []
         for marker in markers:
-            if marker.id >= 100 and marker.id <= 179 and marker.position.distance < self.MIN_DIST:
+            if marker.id >= 100 and marker.id <= 179 and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
                 palletMarkers.append(marker)
 
         # sorts palletMarkers into least to highest distance
@@ -44,65 +44,36 @@ class MyRobotCamera:
                 highRiseMarkers[i], highRiseMarkers[i + 1] = highRiseMarkers[i + 1], highRiseMarkers[i]
         
         return highRiseMarkers
-     
+
+    def is_pallet_on_plinth(self, markers: list, plinth_id: int) -> bool:
+        plinth = None
+        
+        for marker in markers:
+            if marker.id == plinth_id:
+                plinth = marker
+                break
+        
+        if plinth == None:
+            return False
+        
+        for marker in markers:
+            plinth_scaled_angle = plinth.position.horizontal / plinth.position.distance
+            marker_scaled_angle = marker.position.horizontal_angle / marker.position.distance
+            if marker.id != plinth_id and marker_scaled_angle >= plinth_scaled_angle - 0.1 and marker_scaled_angle <= plinth_scaled_angle + 0.1 and marker.position.vertical_angle > plinth.position.vertical_angle:
+                return True
+        
+        return False
+
+    def find_all_markers(self):
+        markers = self.ROBOT.ROBOT.camera.see()
+
+        # sorts markers into least to highest distance
+        for i in range(len(markers) - 1):
+            if markers[i].position.distance > markers[i + 1].position.distance:
+                markers[i], markers[i + 1] = markers[i + 1], markers[i]
+        
+        return markers
+
     def show_marker(self, mx):
         print(f"ID = {mx.id}    Distance = {mx.position.distance}")
         self.ROBOT.DEBUGGER.debug(f"ID = {mx.id}    Distance = {mx.position.distance}")
-
-    def go_to_cube(self, m):
-        for i in range(4):
-            self.ROBOT.right(m.position.horizontal_angle, isRadians=True)
-            self.ROBOT.forward(self.dist_func(m.position.distance) / (4 - i))
-
-
-
-'''
-def CameraMain():
-    robot = MyRobot(dbgEnabled=False)
-    got_marker = False
-
-    mrc = MyRobotCamera(robot)
-
-    n = 0
-
-    while True:
-        if got_marker==False :
-            time.sleep(1)
-
-            markers = mrc.find_pallet_markers();
-
-            if len(markers) < 1:
-                robot.right(10)
-                continue;
-
-            closest_marker = markers[0]
-
-            print("Closest Marker:",closest_marker.id)
-
-            print("Turning",closest_marker.position.horizontal_angle)
-            robot.right(closest_marker.position.horizontal_angle, isRadians=True)
-
-            print("Driving", (closest_marker.position.distance) / 1000)
-            robot.forward((closest_marker.position.distance) / 1000)
-            robot.grab()
-            got_marker = True
-        else:
-
-            markers = mrc.find_high_rise_markers();
-
-            if len(markers) < 1:
-                robot.right(10);
-                continue;
-            
-            found = markers[0]; 
-
-            print("Turning",found.position.horizontal_angle)
-            robot.right(found.position.horizontal_angle, isRadians=True)
-
-            print("Driving", (found.position.distance) / 1000)
-            robot.forward((found.position.distance) / 1000)
-            robot.drop()
-            got_marker = False
-
-            robot.reverse(1)
-'''

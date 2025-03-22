@@ -3,6 +3,7 @@ import time, math
 import util
 from datetime import datetime
 from pid import PID
+from camera import *
 
 class MyRobot:
     __TARGET_MOTORS = [0,1]
@@ -23,6 +24,7 @@ class MyRobot:
     __INIT_PWR = 0.2
     __ROT_FAC = 1
     __LAC_MOVE_TIMES = [9, 8]
+    
 
     def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
         self.__REVOL_DIST = revolDist
@@ -34,6 +36,7 @@ class MyRobot:
         self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
         self.DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
+        self.camera = MyRobotCamera(self.ROBOT)
         
         self.scissor_up()
 
@@ -231,6 +234,16 @@ class MyRobot:
                 self.sleep(0.1)
         self.__setLacState(0)
         print("Scissor down.")
+
+    def pump_grabbing_noise_based(self):
+        outliers = 0
+        for _ in range(5):
+            if self.__getPumpCurrentDraw() > 0.7:
+                outliers+=1
+            self.sleep(0.1)
+        
+        # print(outliers)
+        return outliers > 0
 
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]

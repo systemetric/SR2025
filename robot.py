@@ -1,11 +1,12 @@
 from myrobot import *
 import sys
 import unittest
+import enum
 
 # Uncomment the test you want to run.
 # Tests are defined as functions in tests.py
 
-TESTING = True
+TESTING = False
 tests_to_run = [
     #"drive_back_forwards",
     #"lots_of_rotation_left",
@@ -39,5 +40,87 @@ if TESTING:
 
 robot = MyRobot(accuracy=10, dbgEnabled=False)
 
+TARGET_HIGHRISE = 195 + robot.ROBOT.zone
 
+runningCompetition = True
+visitedMarkers = []
+
+class RobotState(enum.Enum):
+    LOOKING_FOR_CUBES = enum.auto()
+    GRABBING = enum.auto()
+    LOOKING_FOR_DISTRICT = enum.auto()
+    PLACE = enum.auto()
+
+state = RobotState.LOOKING_FOR_CUBES
+while runningCompetition:
+    if (state == RobotState.LOOKING_FOR_CUBES):
+        # find a pallet marker to navigate to
+        pallet_markers = robot.camera.find_pallet_markers(ignored_markers=visitedMarkers)
+        
+        if len(pallet_markers) == 0:
+            robot.right(25)
+        else:
+            pallet = pallet_markers[0]
+            print("Going to", pallet)
+
+            robot.right(pallet.position.horizontal_angle, isRadians=True)
+            robot.forward((pallet.position.distance) / 1000)
+            state = RobotState.GRABBING
+
+    elif (state == RobotState.GRABBING):
+        print("Grabbing pallet...")
+        robot.grab()
+
+        if (robot.pump_grabbing_noise_based()):
+            visitedMarkers.append(pallet)
+            print("Grabbed pallet :)")
+            state = RobotState.LOOKING_FOR_DISTRICT
+        else:
+            print("Cube grab failed. Restarting...")
+            robot.drop()
+            robot.reverse(0.5)
+            state = RobotState.LOOKING_FOR_CUBES
+    
+    elif (state == RobotState.LOOKING_FOR_DISTRICT):
+        markers = robot.camera.find_all_markers()
+
+        plinth = None
+        for marker in markers:
+            if marker.id == TARGET_HIGHRISE:
+                plinth = marker
+                break
+
+        if robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
+            # get high rise marker info
+            for marker in markers:
+                if marker.id == TARGET_HIGHRISE:
+                    highrise = marker
+                    break
+
+            robot.right(highrise.position.horizontal_angle, isRadians=True)
+            robot.forward(((highrise.position.distance) / 1000) - 0.2)
+            state = RobotState.PLACE
+        
+        elif plinth:
+            robot.right(plinth.position.horizontal_angle, isRadians=True)
+            robot.forward(((plinth.position.distance) / 1000))
+            state = RobotState.PLACE
+        else:
+            target = None
+            for marker in markers:
+                if marker.id in visitedMarkers:
+                    target = marker
+                    break
+            
+            if not target:
+                robot.right(15)
+            else:
+                robot.right(target.position.horizontal_angle, isRadians=True)
+                robot.forward(((target.position.distance) / 1000))
+                state = RobotState.PLACE
+    
+    elif (state == RobotState.PLACE):
+        robot.place()
+        robot.reverse(1)
+        state = RobotState.LOOKING_FOR_CUBES
 sys.exit(0)

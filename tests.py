@@ -113,7 +113,41 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(440, 0.15, 0.05)
         robot.sleep(0.4)
         robot.drop()
+
+    def up_down_12_billion(self):
+        for _ in range(100):
+            robot.scissor_down()
+            robot.sleep(0.1)
+            robot.scissor_up()
+            robot.sleep(0.1)
+            if len(robot.see_and_capture()) != 0:
+               break
+     
+    def back_forwards_12_billion(self):
+        while len(list(filter(lambda x: x.id == 141, robot.see_and_capture("beans.png")))) == 0:
+            robot.forward(2)
+            robot.right(180)
+            robot.forward(2)
+            robot.left(180)
     
+    def pump_grab_noise_based(self):
+        robot.pump = True
+        for _ in range(20):
+            robot.beep_sync(262, 0.15, 0.05) #C
+            robot.beep_sync(392, 0.55, 0.05) #G
+            robot.sleep(0.5)
+            print("Checking...")
+            if robot.pump_grabbing_noise_based():
+                print("Grabbed!")
+                robot.sleep(0.5)
+                robot.beep_sync(880, 0.1, 0.05) #A
+                robot.beep_sync(880, 0.3, 0.05) #A
+            else:
+                print("Not Grabbed!")
+                robot.sleep(0.5)
+                robot.beep_sync(262, 0.15, 0.05) #C
+            robot.sleep(5)
+
     # WILL CRASH
     def scissor_read_current(self):
         """Stream current from linear actuator.
@@ -238,13 +272,21 @@ class TestRobot(unittest.TestCase):
                     robot.drop()
 
     def navigate_to_cube(self):
-        """Uses camera to locate a cube, drive to it and pick it up.
-        """
         mrc = MyRobotCamera(robot)
 
-        while True:
-            self.pick_up_cube(mrc, 0, True)
-            self.pick_up_cube(mrc, 1, False)
+        for i in range(36):
+            robot.right(20)
+            m = mrc.find_pallet_markers()
+            
+            if len(m) > 0:
+                print(f"{i}:")
+                for mx in m:
+                    print(f"    ID = {mx.id}    Distance = {mx.position.distance}    Angle = {mx.position.horizontal_angle}")
+                
+                closest = m[0]
+                robot.right(closest.position.horizontal_angle, isRadians=True)
+                robot.forward((closest.position.distance) / 1000)
+                robot.grab()
 
     def go_to_cube(self, m):
         for i in range(4):
