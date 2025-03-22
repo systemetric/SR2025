@@ -182,7 +182,7 @@ class MyRobot:
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
-        SPECIAL_κ = 1.0137125 # Old: 1.0087125 ## DO NOT CHANGE!
+        SPECIAL_κ = 1.0097125 # Old: 1.0087125 ## DO NOT CHANGE!
         self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ)
         
     def __setLacState(self, v):

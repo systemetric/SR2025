@@ -94,7 +94,7 @@ class TestRobot(unittest.TestCase):
                 break;
     
     def back_forwards_12_billion(self):
-        while len(robot.see_and_capture("beans.png")) == 0:
+        while len(list(filter(lambda x: x.id == 141, robot.see_and_capture("beans.png")))) == 0:
             robot.forward(2)
             robot.right(180)
             robot.forward(2)
