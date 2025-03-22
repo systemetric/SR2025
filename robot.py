@@ -10,7 +10,7 @@ tests_to_run = [
      #"drive_back_forwards",
      #"drive_back_forwards",
     #"drive_back_forwards",
-    "navigate_to_cube",
+    #"navigate_to_cube",
     #"drive_right_triangle",
     # "lac_up_down",
     # "lac_time_up_down",
