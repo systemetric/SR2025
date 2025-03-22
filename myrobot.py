@@ -17,6 +17,8 @@ class MyRobot:
     __MOTOR_MB = None
     __PUMP_MB = None
     DEBUGGER = None
+    __M0FAC = 1
+    __M1FAC = 1
     __LAC_MOVE_TIMES = [9, 8]
 
     def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
@@ -24,7 +26,7 @@ class MyRobot:
         self.__TARGET_MOTORS = targetMotors
         self.__ACCURACY = accuracy
 
-        self.ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)])
+        self.ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)]) # type: ignore
         self.__MOTOR_MB = self.ROBOT.motor_boards["SR0UK1L"]
         self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
@@ -44,6 +46,9 @@ class MyRobot:
             self.__MOTOR_MB.motors[0].power = 0
         if 1 in motors:
             self.__MOTOR_MB.motors[1].power = 0
+
+    def __clamp(self, pmin, x, pmax):
+        return max(min(x, pmax), pmin)
 
     def __powerByCount(self, pCount, pidObject):
         return pidObject(pCount)
@@ -66,7 +71,6 @@ class MyRobot:
             return 1, 1
         
     def __motorAlign(self, m0Count, m1Count, mIntegral):
-     #   m0Count, m1Count = abs(m0Count), abs(m1Count)
         pDelta = m0Count - m1Count
         
         factor = self.__clamp(0, mIntegral / 100, 1)
@@ -77,23 +81,44 @@ class MyRobot:
             return 1, factor
         else:
             return 1, 1
-        
-    def __clamp(self, pmin, x, pmax):
-        return max(min(x, pmax), pmin)
 
-    def __RobotDrive(self, pDistance):
-        self.DEBUGGER.debug(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
+    def __count_correct(self, mxPID, m0Count, m1Count):
+        countDelta = abs(m0Count - m1Count)
+        factor = self.__clamp(0, 1 - countDelta / 100, 1);
+
+        print(f"cd: {countDelta}, f: {factor}")
+
+        if m0Count > m1Count:
+            self.__M0FAC, self.__M1FAC = factor, 1
+        elif m0Count < m1Count:
+            self.__M0FAC, self.__M1FAC = 1, factor
+        else:
+            self.__M0FAC, self.__M1FAC = 1, 1
+        
+    def __update_facs(self, m0Speed, m1Speed):
+        sDelta = m0Speed - m1Speed
+        print(sDelta)
+        self.__M0FAC -= sDelta / 1000
+
+    def __RobotDrive(self, pDistance, rotate=False):
+        self.__M0FAC = 1
+        self.__M1FAC = 1
+
+        print(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
         
         # Calculate target
         targetCount = int(self.__COUNTS_PER_REVOL * pDistance / self.__REVOL_DIST)
 
-        self.DEBUGGER.debug(f"Going to {targetCount}...\n")
+        print(f"Going to {targetCount}...\n")
 
         # Initialise PID objects
         m0PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[0])
         m0PID.output_limits = (-1,1)
         m1PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[1])
         m1PID.output_limits = (-1,1)
+
+        mxPID = PID(0.01, 1, 0, setpoint=0)
+        mxPID.output_limits = (0,1)
 
         m0reached = False
         m1reached = False
@@ -127,7 +152,6 @@ class MyRobot:
             m0δ, m1δ = m0Count - m0LastCount, m1Count - m1LastCount
             m0LastCount, m1LastCount = m0Count, m1Count
 
-            # 
             mIntegral += abs(m0Count - m1Count)
 
             # Get time delta
@@ -138,42 +162,40 @@ class MyRobot:
             # Get current motor speed
             m0χ, m1χ = m0δ / δt, m1δ / δt
 
+            if not rotate:
+                self.__count_correct(mxPID, m0Count, m1Count)
+
             # Obtain scaling factors for motor speed
             #factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
-            factorM0, factorM1 = self.__motorAlign(m0Count, m1Count, mIntegral)
-            message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
-            self.DEBUGGER.debug(f"{factorM0},{factorM1}")
+            #factorM0, factorM1 = self.__motorAlign(m0Count, m1Count, mIntegral)
+            #factorM0, factorM1 = self.__speed_correct(mxPID, m0χ, m1χ)
+            #message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
+            #self.DEBUGGER.debug(f"{factorM0},{factorM1}")
 
-            self.DEBUGGER.debug(f"{time.time()},{factorM0},{factorM1}")
+            #self.DEBUGGER.debug(f"{time.time()},{factorM0},{factorM1}")
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
-                # Get new power for M0
-                self.__MOTOR_MB.motors[0].power = (m0Power := self.__clamp(-1, factorM0 * self.__powerByCount(m0Count, m0PID), 1))
-                message += f"M0: Count: {m0Count}, power: {m0Power}\n"
-
-                # Within range and slow enough to stop?
+                self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID))
+                message += f"M0: Count: {m0Count}, M0Fac: {self.__M0FAC}\n"
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
-              #  self.DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
                 if m0reached:
                     message += "Stopped M0\n"
                     self.__setReached(motors=[0])
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
-                # Get new power for M1
-                self.__MOTOR_MB.motors[1].power = (m1Power := self.__clamp(-1, factorM1 * self.__powerByCount(m1Count, m1PID), 1))
-                message += f"M1: Count: {m1Count}, power: {m1Power}\n"
-
-                # Within range and slow enough to stop?
+                self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID))
+                message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}\n"
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
-              # self.DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
 
             m0LastCount= m0Count
             m1LastCount = m1Count
-          #  self.DEBUGGER.debug(message)
+            print(message)
+            #self.DEBUGGER.debug(message)
             message = ""
+            time.sleep(0.05)
 
         self.stop()
      #   self.ROBOT.sleep(.5)
@@ -182,8 +204,8 @@ class MyRobot:
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
-        SPECIAL_κ = 1.097125 # Old: 1.0087125 ## DO NOT CHANGE!
-        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ)
+        SPECIAL_κ = 1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
+        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True)
         
     def __setLacState(self, v):
         self.__PUMP_MB.motors[1].power = v

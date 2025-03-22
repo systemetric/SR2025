@@ -22,9 +22,9 @@ class TestRobot(unittest.TestCase):
         """Drive forwards, turn around, drive backwards.
         """
         robot.forward(3)
-       # robot.right(180)
-      #  robot.forward(3)
-       # robot.right(180)
+        robot.right(180)
+        robot.forward(3)
+        robot.right(180)
 
     def drive_right_triangle(self):
         """Drive in a triangle, turns right each time.
@@ -35,6 +35,22 @@ class TestRobot(unittest.TestCase):
         robot.right(145)
         robot.forward(1.5)
         robot.right(90)
+
+    def up_down_12_billion(self):
+        for _ in range(100):
+            robot.scissor_down()
+            robot.sleep(0.1)
+            robot.scissor_up()
+            robot.sleep(0.1)
+            if len(robot.see_and_capture()) != 0:
+                break;
+    
+    def back_forwards_12_billion(self):
+        while len(robot.see_and_capture("beans.png")) == 0:
+            robot.forward(2)
+            robot.right(180)
+            robot.forward(2)
+            robot.left(180)
     
     def motor_challenge(self):
         """Drives in the right triangle three times.
@@ -230,14 +246,14 @@ class TestRobot(unittest.TestCase):
             if not found:
                 markers = mrc.find_pallet_markers()
                 if len(markers) > 0:
-                    self.go_to_cube(mrc, markers[0])
+                    mrc.go_to_cube(mrc, markers[0])
                     robot.grab()
                     found = True
-                robot.right(10)        
+                robot.right(10)
             else:
                 markers = mrc.find_high_rise_markers()
                 if len(markers) > 0:
-                    self.go_to_cube(mrc, markers[0])
+                    mrc.go_to_cube(mrc, markers[0])
                     robot.drop()
                     found = False
                 robot.left(10)

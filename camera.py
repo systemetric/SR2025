@@ -2,15 +2,15 @@ import os,sys,math,time
 from myrobot import *
 
 class MyRobotCamera:
-     __MARKER_PALLET = 0
-     __MARKER_PLINTH = 1
+    __MARKER_PALLET = 0
+    __MARKER_PLINTH = 1
 
-     def __init__(self, robot, min_dist=999999):
+    def __init__(self, robot, min_dist=999999):
         self.MIN_DIST = min_dist
         self.ROBOT = robot
         self.__NEXT_OBJ = self.__MARKER_PALLET
 
-     def find_pallet_markers(self):
+    def find_pallet_markers(self):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
         markers = self.ROBOT.ROBOT.camera.see()
 
@@ -29,7 +29,7 @@ class MyRobotCamera:
 
         return palletMarkers
 
-     def find_high_rise_markers(self):
+    def find_high_rise_markers(self):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
         markers = self.ROBOT.ROBOT.camera.see()
 
@@ -45,9 +45,16 @@ class MyRobotCamera:
         
         return highRiseMarkers
      
-     def show_marker(self, mx):
-         print(f"ID = {mx.id}    Distance = {mx.position.distance}")
-         self.ROBOT.DEBUGGER.debug(f"ID = {mx.id}    Distance = {mx.position.distance}")
+    def show_marker(self, mx):
+        print(f"ID = {mx.id}    Distance = {mx.position.distance}")
+        self.ROBOT.DEBUGGER.debug(f"ID = {mx.id}    Distance = {mx.position.distance}")
+
+    def go_to_cube(self, m):
+        for i in range(4):
+            self.ROBOT.right(m.position.horizontal_angle, isRadians=True)
+            self.ROBOT.forward(self.dist_func(m.position.distance) / (4 - i))
+
+
 
 '''
 def CameraMain():

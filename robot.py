@@ -11,7 +11,7 @@ tests_to_run = [
      #"drive_back_forwards",
     #"drive_back_forwards",
     #"navigate_to_cube",
-    #"drive_right_triangle",
+    "drive_right_triangle",
     # "lac_up_down",
     # "lac_time_up_down",
     # "pump_on_off",
@@ -23,6 +23,9 @@ tests_to_run = [
     # "motor_challenge",
     # "play_fetch",
     # "pump_toggler"
+    #"back_forwards_12_billion",
+    # "up_down_12_billion",
+    #"game_tests"
 ]
 
 if TESTING:
