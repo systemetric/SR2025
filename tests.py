@@ -216,5 +216,32 @@ class TestRobot(unittest.TestCase):
             self.pick_up_cube(mrc, 0, True)
             self.pick_up_cube(mrc, 1, False)
 
+    def go_to_cube(self, m):
+        for i in range(4):
+            robot.right(m.position.horizontal_angle, isRadians=True)
+            robot.forward(self.dist_func(m.position.distance) / (4 - i))
+
+    def game_tests(self):
+        mrc = MyRobotCamera(robot)
+        robot.forward(1200)
+        running = True
+        found = False
+        while running:
+            if not found:
+                markers = mrc.find_pallet_markers()
+                if len(markers) > 0:
+                    self.go_to_cube(mrc, markers[0])
+                    robot.grab()
+                    found = True
+                robot.right(10)        
+            else:
+                markers = mrc.find_high_rise_markers()
+                if len(markers) > 0:
+                    self.go_to_cube(mrc, markers[0])
+                    robot.drop()
+                    found = False
+                robot.left(10)
+
+
 if __name__ == '__main__':
     unittest.main()

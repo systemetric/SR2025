@@ -65,6 +65,19 @@ class MyRobot:
         else:
             return 1, 1
         
+    def __motorAlign(self, m0Count, m1Count, mIntegral):
+     #   m0Count, m1Count = abs(m0Count), abs(m1Count)
+        pDelta = m0Count - m1Count
+        
+        factor = self.__clamp(0, mIntegral / 100, 1)
+        
+        if m0Count > m1Count:
+            return factor, 1
+        elif m1Count < m0Count:
+            return 1, factor
+        else:
+            return 1, 1
+        
     def __clamp(self, pmin, x, pmax):
         return max(min(x, pmax), pmin)
 
@@ -87,6 +100,8 @@ class MyRobot:
 
         m0LastCount = 0
         m1LastCount = 0
+
+        mIntegral = 0
 
         # Reset motor counts
         self.ROBOT.arduino.command("c")
@@ -112,6 +127,9 @@ class MyRobot:
             m0δ, m1δ = m0Count - m0LastCount, m1Count - m1LastCount
             m0LastCount, m1LastCount = m0Count, m1Count
 
+            # 
+            mIntegral += abs(m0Count - m1Count)
+
             # Get time delta
             thisTime = time.time()
             δt = thisTime - lastTime
@@ -121,10 +139,12 @@ class MyRobot:
             m0χ, m1χ = m0δ / δt, m1δ / δt
 
             # Obtain scaling factors for motor speed
-            factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
+            #factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
+            factorM0, factorM1 = self.__motorAlign(m0Count, m1Count, mIntegral)
             message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
+            self.DEBUGGER.debug(f"{factorM0},{factorM1}")
 
-            self.DEBUGGER.debug(f"{time.time()},{m0Count},{m1Count}")
+            self.DEBUGGER.debug(f"{time.time()},{factorM0},{factorM1}")
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
                 # Get new power for M0
@@ -133,7 +153,7 @@ class MyRobot:
 
                 # Within range and slow enough to stop?
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
-                self.DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
+              #  self.DEBUGGER.debug(abs(abs(targetCount) - abs(m0Count)))
                 if m0reached:
                     message += "Stopped M0\n"
                     self.__setReached(motors=[0])
@@ -145,14 +165,14 @@ class MyRobot:
 
                 # Within range and slow enough to stop?
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
-                self.DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
+              # self.DEBUGGER.debug(abs(abs(targetCount) - abs(m1Count)))
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
 
             m0LastCount= m0Count
             m1LastCount = m1Count
-            self.DEBUGGER.debug(message)
+          #  self.DEBUGGER.debug(message)
             message = ""
 
         self.stop()
