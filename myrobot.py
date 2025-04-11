@@ -8,7 +8,7 @@ from camera import *
 class MyRobot:
     __TARGET_MOTORS = [0,1]
     __REVERSE = [1, 1]
-    __COUNTS_PER_REVOL = 854.285714286# 897
+    __COUNTS_PER_REVOL = 854.285714286
     __REVOL_DIST = 0.392 # m
     __ACCURACY = 30
     __P, __I, __D = [0.01, 0, 0.00003]
@@ -85,12 +85,13 @@ class MyRobot:
         print(f"cd: {countDelta}, f: {factor}")
         res = [1,1]
         if m0Count > m1Count:
-            res = factor, 1
+    
+            res = [factor, 1]
         elif m0Count < m1Count:
-            res = 1, factor
+            res = [1, factor]
         
-        if target < 0:
-            res = res[::-1]
+        #if target < 0:
+        #    res = res[::-1]
 
         self.__M0FAC, self.__M1FAC = res
 
@@ -168,13 +169,13 @@ class MyRobot:
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
                 self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID, targetCount, rotate))
-                message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}, M1Power; {m0Power}\n"
+                message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}, M1Power; {m1Power}\n"
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
 
-            m0LastCount= m0Count
+            m0LastCount = m0Count
             m1LastCount = m1Count
             print(message)
             #self.DEBUGGER.debug(message)

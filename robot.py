@@ -11,8 +11,13 @@ tests_to_run = [
     #"drive_back_forwards",
     #"lots_of_rotation_left",
     #"lots_of_rotation_right",
+<<<<<<< Updated upstream
     # "rotate_20",
     #"drive_reverse",
+=======
+    #"rotate_20",
+    "drive_reverse",
+>>>>>>> Stashed changes
     #"drive_back_forwards",
     #"drive_back_forwards",
     #"navigate_to_cube",
