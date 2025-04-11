@@ -57,7 +57,7 @@ class MyRobot:
         return (1- self.__INIT_PWR)/(endCount) * currentCount + self.__INIT_PWR
     
     def __powerByCount(self, pCount, pidObject, tCount, rot):
-        return pidObject(pCount) * (self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount) if pCount < tCount * self.__ACCEL_CONST and not rot else 1)
+        return pidObject(pCount) * (self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount) if pCount < tCount * self.__ACCEL_CONST and not rot else (self.__ROT_FAC if rot else 1))
 
     def __count_correct(self, m0Count, m1Count):
         # MAYBE BAD
@@ -75,9 +75,11 @@ class MyRobot:
         else:
             self.__M0FAC, self.__M1FAC = 1, 1
 
-    def __RobotDrive(self, pDistance, rotate=False):
+    def __RobotDrive(self, pDistance, rotate=False, rotateFactor=1):
         self.__M0FAC = 1
         self.__M1FAC = 1
+
+        self.__ROT_FAC = rotateFactor
 
         print(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
         
@@ -164,13 +166,18 @@ class MyRobot:
      #   self.ROBOT.sleep(.5)
 
     def __RobotRotate(self, pAngle, SPECIAL_κ):
+        fac = 1
+
+        if pAngle < 180:
+            fac = 0.5
+
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
 
         #SPECIAL_κ = 1.165890625 #1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
 
-        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True)
+        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True, rotateFactor=fac)
         
     def __setLacState(self, v):
         self.__PUMP_MB.motors[1].power = v
@@ -227,7 +234,7 @@ class MyRobot:
     def right(self, angle, isRadians = False):
         self.__REVERSE = [-1, 1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi), 1.1325) #65890625
+            self.__RobotRotate(angle * (180 / math.pi), 1.1325)
         else:
             self.__RobotRotate(angle, 1.1325)
 
