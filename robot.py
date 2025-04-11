@@ -11,7 +11,7 @@ tests_to_run = [
     #"drive_back_forwards",
     #"lots_of_rotation_left",
     #"lots_of_rotation_right",
-    "rotate_20",
+    # "rotate_20",
     #"drive_reverse",
     #"drive_back_forwards",
     #"drive_back_forwards",
