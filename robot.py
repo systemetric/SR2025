@@ -40,7 +40,8 @@ if TESTING:
 
 robot = MyRobot(accuracy=10, dbgEnabled=False)
 
-TARGET_HIGHRISE = 195 + robot.ROBOT.zone
+TARGET_HIGHRISE = 195 + robot.zone
+print("Hello! I'm looking for high rise:", TARGET_HIGHRISE)
 
 runningCompetition = True
 visitedMarkers = []
@@ -53,12 +54,15 @@ class RobotState(enum.Enum):
 
 state = RobotState.LOOKING_FOR_CUBES
 while runningCompetition:
+    print("Current state:", state)
+
     if (state == RobotState.LOOKING_FOR_CUBES):
         # find a pallet marker to navigate to
+        # |  || || |_
         pallet_markers = robot.camera.find_pallet_markers(ignored_markers=visitedMarkers)
         
         if len(pallet_markers) == 0:
-            robot.right(25)
+            robot.right(20)
         else:
             pallet = pallet_markers[0]
             print("Going to", pallet)

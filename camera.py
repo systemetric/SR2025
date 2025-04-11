@@ -5,14 +5,20 @@ class MyRobotCamera:
     __MARKER_PALLET = 0
     __MARKER_PLINTH = 1
 
-    def __init__(self, robot, min_dist=999999):
+    def __init__(self, robot, zone, min_dist=999999):
         self.MIN_DIST = min_dist
         self.ROBOT = robot
         self.__NEXT_OBJ = self.__MARKER_PALLET
+        self.zone = zone
 
     def find_pallet_markers(self, ignored_markers:list = []):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
-        markers = self.ROBOT.ROBOT.camera.see()
+        markers = self.ROBOT.camera.see()
+
+        MIN_PALLET = (self.zone * 20) + 100
+        MAX_PALLET = MIN_PALLET + 19
+
+        print("I'm looking for pallets from", MIN_PALLET, "to", MAX_PALLET)
 
         palletMarkers = []
         for marker in markers:
@@ -31,7 +37,7 @@ class MyRobotCamera:
 
     def find_high_rise_markers(self):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
-        markers = self.ROBOT.ROBOT.camera.see()
+        markers = self.ROBOT.camera.see()
 
         highRiseMarkers = []
         for marker in markers:
@@ -65,7 +71,7 @@ class MyRobotCamera:
         return False
 
     def find_all_markers(self):
-        markers = self.ROBOT.ROBOT.camera.see()
+        markers = self.ROBOT.camera.see()
 
         # sorts markers into least to highest distance
         for i in range(len(markers) - 1):
@@ -76,4 +82,4 @@ class MyRobotCamera:
 
     def show_marker(self, mx):
         print(f"ID = {mx.id}    Distance = {mx.position.distance}")
-        self.ROBOT.DEBUGGER.debug(f"ID = {mx.id}    Distance = {mx.position.distance}")
+        # self.ROBOT.DEBUGGER.debug(f"ID = {mx.id}    Distance = {mx.position.distance}")

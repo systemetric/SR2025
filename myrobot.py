@@ -24,7 +24,7 @@ class MyRobot:
     __INIT_PWR = 0.2
     __ROT_FAC = 1
     __LAC_MOVE_TIMES = [9, 8]
-    
+
 
     def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
         self.__REVOL_DIST = revolDist
@@ -35,8 +35,13 @@ class MyRobot:
         self.__MOTOR_MB = self.ROBOT.motor_boards["SR0UK1L"]
         self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
+        if self.ROBOT.mode == COMP:
+            self.zone = self.ROBOT.zone
+        else:
+            self.zone = 2
+
         self.DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
-        self.camera = MyRobotCamera(self.ROBOT)
+        self.camera = MyRobotCamera(self.ROBOT, self.zone)
         
         self.scissor_up()
 
@@ -201,6 +206,9 @@ class MyRobot:
     
     def __getLacCurrentDraw(self):
         return self.__PUMP_MB.motors[1].current
+    
+    def __getPumpCurrentDraw(self):
+        return self.__PUMP_MB.motors[0].current
     
     def getPUMP_MB(self):
         return self.__PUMP_MB
