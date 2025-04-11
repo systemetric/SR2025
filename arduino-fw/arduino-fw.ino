@@ -5,11 +5,15 @@
 const int signal0A = 2;
 const int signal0B = 4;
 const int signal1A = 3;
-const int signal1B = 7;
+const int signal1B = 5;
+const int signal0X = 8;
+const int signal1X = 9;
+const int signal0Y = 10;
+const int signal1Y = 11;
 
 //debugging pins
-const int debugUART = 8;
-const int debugInterrupt = 9;
+const int debugUART = 12;
+const int debugInterrupt = 13;
 
 //Interrupt functions
 void CountMotor0();
@@ -34,6 +38,18 @@ void setup() {
 
   pinMode(signal1A, INPUT);
   pinMode(signal1B, INPUT);
+
+  pinMode(signal0X, OUTPUT);
+  pinMode(signal1X, OUTPUT);
+
+  pinMode(signal0Y, OUTPUT);
+  pinMode(signal1Y, OUTPUT);
+
+  digitalWrite(signal0X, HIGH);
+  digitalWrite(signal1X, HIGH);
+
+  digitalWrite(signal0Y, LOW);
+  digitalWrite(signal1Y, LOW);
 
   pinMode(debugUART, OUTPUT);
   pinMode(debugInterrupt, OUTPUT);
@@ -118,13 +134,13 @@ void CountMotor0()
   else
     digitalWrite(debugInterrupt, 1);
   //Check if B is high or low to decide how to change the count
-  countM0 += (digitalRead(signal0B) == 0 ? 1 : -1);
+  countM0 -= (digitalRead(signal0B) == 0 ? 1 : -1);
 }
 
 void CountMotor1()
 {
   digitalWrite(debugInterrupt, 1);
-  countM1 += (digitalRead(signal1B) == 0 ? 1 : -1);
+  countM1 -= (digitalRead(signal1B) == 0 ? 1 : -1);
   digitalWrite(debugInterrupt, 0);
 }
 

@@ -7,10 +7,10 @@ from pid import PID
 class MyRobot:
     __TARGET_MOTORS = [0,1]
     __REVERSE = [1, 1]
-    __COUNTS_PER_REVOL = 2720
+    __COUNTS_PER_REVOL = 854.285714286# 897
     __REVOL_DIST = 0.392 # m
     __ACCURACY = 30
-    __P, __I, __D = [0.005, 0, 0]
+    __P, __I, __D = [0.01, 0, 0.00003]
     __ARDUINO_SERIAL = "7523031383335161A231"
     __BAUD = 115200
     ROBOT = None
@@ -176,7 +176,7 @@ class MyRobot:
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
                 self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID))
-                message += f"M0: Count: {m0Count}, M0Fac: {self.__M0FAC}\n"
+                message += f"M0: Count: {m0Count}, M0Fac: {self.__M0FAC}, M0Power; {m0Power}\n"
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
                 if m0reached:
                     message += "Stopped M0\n"
@@ -184,7 +184,7 @@ class MyRobot:
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
                 self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID))
-                message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}\n"
+                message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}, M1Power; {m0Power}\n"
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
                 if m1reached:
                     message += "Stopped M1\n"
@@ -200,11 +200,13 @@ class MyRobot:
         self.stop()
      #   self.ROBOT.sleep(.5)
 
-    def __RobotRotate(self, pAngle):
+    def __RobotRotate(self, pAngle, SPECIAL_κ):
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
-        SPECIAL_κ = 1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
+
+        #SPECIAL_κ = 1.165890625 #1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
+
         self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True)
         
     def __setLacState(self, v):
@@ -262,16 +264,16 @@ class MyRobot:
     def right(self, angle, isRadians = False):
         self.__REVERSE = [-1, 1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi))
+            self.__RobotRotate(angle * (180 / math.pi), 1.165890625)
         else:
-            self.__RobotRotate(angle)
+            self.__RobotRotate(angle, 1.165890625)
 
     def left(self, angle, isRadians = False):
         self.__REVERSE = [1, -1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi))
+            self.__RobotRotate(angle * (180 / math.pi), 1.29725)
         else:
-            self.__RobotRotate(angle)
+            self.__RobotRotate(angle, 1.29725)
     
     def grab(self):
         self.pump = True

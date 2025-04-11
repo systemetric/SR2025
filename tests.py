@@ -21,10 +21,11 @@ class TestRobot(unittest.TestCase):
     def drive_back_forwards(self):
         """Drive forwards, turn around, drive backwards.
         """
-        robot.forward(3)
-        robot.right(180)
-        robot.forward(3)
-        robot.right(180)
+        #robot.forward(2)
+        robot.right(360)
+        robot.left(360)
+        #robot.forward(2)
+        #robot.right(180)
 
     def drive_right_triangle(self):
         """Drive in a triangle, turns right each time.
