@@ -19,6 +19,9 @@ class MyRobot:
     DEBUGGER = None
     __M0FAC = 1
     __M1FAC = 1
+    __ACCEL_CONST = 0.05
+    __INIT_PWR = 0.2
+    __ROT_FAC = 1
     __LAC_MOVE_TIMES = [9, 8]
 
     def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
@@ -50,41 +53,18 @@ class MyRobot:
     def __clamp(self, pmin, x, pmax):
         return max(min(x, pmax), pmin)
 
-    def __powerByCount(self, pCount, pidObject):
-        return pidObject(pCount)
+    def __initialAccelCurve(self, endCount, currentCount):        
+        return (1- self.__INIT_PWR)/(endCount) * currentCount + self.__INIT_PWR
+    
+    def __powerByCount(self, pCount, pidObject, tCount, rot):
+        return pidObject(pCount) * (self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount) if pCount < tCount * self.__ACCEL_CONST and not rot else 1)
 
-    def __pidOverMotors(self, m0Count, m1Count):
+    def __count_correct(self, m0Count, m1Count):
+        # MAYBE BAD
         m0Count, m1Count = abs(m0Count), abs(m1Count)
-        pDelta = m0Count - m1Count
-        pSum = m0Count + m1Count
 
-        if abs(pDelta) < 25:
-            return 1, 1
-        
-        factor = 1 if pSum == 0 else 1 - (abs(pDelta) ** 2) / abs(pSum)
-        
-        if pDelta > 0:
-            return factor, 1
-        elif pDelta < 0:
-            return 1, factor
-        else:
-            return 1, 1
-        
-    def __motorAlign(self, m0Count, m1Count, mIntegral):
-        pDelta = m0Count - m1Count
-        
-        factor = self.__clamp(0, mIntegral / 100, 1)
-        
-        if m0Count > m1Count:
-            return factor, 1
-        elif m1Count < m0Count:
-            return 1, factor
-        else:
-            return 1, 1
-
-    def __count_correct(self, mxPID, m0Count, m1Count):
         countDelta = abs(m0Count - m1Count)
-        factor = self.__clamp(0, 1 - countDelta / 100, 1);
+        factor = self.__clamp(0, 1 - countDelta / 100, 1)
 
         print(f"cd: {countDelta}, f: {factor}")
 
@@ -94,11 +74,6 @@ class MyRobot:
             self.__M0FAC, self.__M1FAC = 1, factor
         else:
             self.__M0FAC, self.__M1FAC = 1, 1
-        
-    def __update_facs(self, m0Speed, m1Speed):
-        sDelta = m0Speed - m1Speed
-        print(sDelta)
-        self.__M0FAC -= sDelta / 1000
 
     def __RobotDrive(self, pDistance, rotate=False):
         self.__M0FAC = 1
@@ -116,9 +91,6 @@ class MyRobot:
         m0PID.output_limits = (-1,1)
         m1PID = PID(self.__P, self.__I, self.__D, setpoint = targetCount * self.__REVERSE[1])
         m1PID.output_limits = (-1,1)
-
-        mxPID = PID(0.01, 1, 0, setpoint=0)
-        mxPID.output_limits = (0,1)
 
         m0reached = False
         m1reached = False
@@ -162,20 +134,11 @@ class MyRobot:
             # Get current motor speed
             m0χ, m1χ = m0δ / δt, m1δ / δt
 
-            if not rotate:
-                self.__count_correct(mxPID, m0Count, m1Count)
-
-            # Obtain scaling factors for motor speed
-            #factorM0, factorM1 = self.__pidOverMotors(m0Count, m1Count)
-            #factorM0, factorM1 = self.__motorAlign(m0Count, m1Count, mIntegral)
-            #factorM0, factorM1 = self.__speed_correct(mxPID, m0χ, m1χ)
-            #message += f"M0 Factor: {factorM0}\nM1Factor: {factorM1}\n"
-            #self.DEBUGGER.debug(f"{factorM0},{factorM1}")
-
-            #self.DEBUGGER.debug(f"{time.time()},{factorM0},{factorM1}")
+           # if not rotate:
+            self.__count_correct(m0Count, m1Count)
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
-                self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID))
+                self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID, targetCount, rotate))
                 message += f"M0: Count: {m0Count}, M0Fac: {self.__M0FAC}, M0Power; {m0Power}\n"
                 m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
                 if m0reached:
@@ -183,7 +146,7 @@ class MyRobot:
                     self.__setReached(motors=[0])
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
-                self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID))
+                self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID, targetCount, rotate))
                 message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}, M1Power; {m0Power}\n"
                 m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
                 if m1reached:
@@ -264,9 +227,9 @@ class MyRobot:
     def right(self, angle, isRadians = False):
         self.__REVERSE = [-1, 1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi), 1.165890625)
+            self.__RobotRotate(angle * (180 / math.pi), 1.1325) #65890625
         else:
-            self.__RobotRotate(angle, 1.165890625)
+            self.__RobotRotate(angle, 1.1325)
 
     def left(self, angle, isRadians = False):
         self.__REVERSE = [1, -1]

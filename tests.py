@@ -3,7 +3,7 @@ import time
 from myrobot import *
 from camera import *
 
-robot = MyRobot(accuracy=25, dbgEnabled=True)
+robot = MyRobot(accuracy=25, dbgEnabled=False)
 
 class TestRobot(unittest.TestCase):
     def setUp(self):
@@ -21,11 +21,10 @@ class TestRobot(unittest.TestCase):
     def drive_back_forwards(self):
         """Drive forwards, turn around, drive backwards.
         """
-        #robot.forward(2)
-        robot.right(360)
-        robot.left(360)
-        #robot.forward(2)
-        #robot.right(180)
+        robot.forward(2)
+        robot.right(180)
+        robot.forward(2)
+        robot.right(180)
 
     def drive_right_triangle(self):
         """Drive in a triangle, turns right each time.
@@ -84,6 +83,16 @@ class TestRobot(unittest.TestCase):
         for _ in range(3):
             robot.beep(220)
             robot.sleep(0.5)
+        
+    def lots_of_rotation_right(self):
+        robot.right(360 * 100)
+
+    def lots_of_rotation_left(self):
+        robot.right(360 * 100)
+
+    def rotate_20(self):
+        for i in range(18):
+            robot.right(20)
     
     def pump_on_off(self):
         """Turn on pump for ten seconds then turn it off.
