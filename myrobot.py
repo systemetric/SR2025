@@ -1,4 +1,4 @@
-from sr.robot3 import * # type: ignore
+from sr.robot3 import *
 import time, math
 import util
 from datetime import datetime

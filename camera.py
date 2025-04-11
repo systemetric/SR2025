@@ -26,9 +26,11 @@ class MyRobotCamera:
                 palletMarkers.append(marker)
 
         # sorts palletMarkers into least to highest distance
-        for i in range(len(palletMarkers) - 1):
-            if palletMarkers[i].position.distance > palletMarkers[i + 1].position.distance:
-                palletMarkers[i], palletMarkers[i + 1] = palletMarkers[i + 1], palletMarkers[i]
+        palletMarkers.sort(key=lambda m: m.position.distance)
+
+        # for i in range(len(palletMarkers) - 1):
+        #     if palletMarkers[i].position.distance > palletMarkers[i + 1].position.distance:
+        #         palletMarkers[i], palletMarkers[i + 1] = palletMarkers[i + 1], palletMarkers[i]
         
         for palletMarker in palletMarkers:
             self.show_marker(palletMarker)
@@ -63,7 +65,7 @@ class MyRobotCamera:
             return False
         
         for marker in markers:
-            plinth_scaled_angle = plinth.position.horizontal / plinth.position.distance
+            plinth_scaled_angle = plinth.position.horizontal_angle / plinth.position.distance
             marker_scaled_angle = marker.position.horizontal_angle / marker.position.distance
             if marker.id != plinth_id and marker_scaled_angle >= plinth_scaled_angle - 0.1 and marker_scaled_angle <= plinth_scaled_angle + 0.1 and marker.position.vertical_angle > plinth.position.vertical_angle:
                 return True

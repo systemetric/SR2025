@@ -53,6 +53,8 @@ class RobotState(enum.Enum):
     PLACE = enum.auto()
 
 state = RobotState.LOOKING_FOR_CUBES
+total_search_rotation = 0
+
 while runningCompetition:
     print("Current state:", state)
 
@@ -61,14 +63,24 @@ while runningCompetition:
         # |  || || |_
         pallet_markers = robot.camera.find_pallet_markers(ignored_markers=visitedMarkers)
         
+        # if we have turned all the way around, not found anything, reverse.
+        if total_search_rotation > 360:
+            robot.reverse(0.5)
+            total_search_rotation = 0
+
         if len(pallet_markers) == 0:
             robot.right(20)
+            total_search_rotation += 20
         else:
+            total_search_rotation = 0
+
             pallet = pallet_markers[0]
             print("Going to", pallet)
 
             robot.right(pallet.position.horizontal_angle, isRadians=True)
-            robot.forward((pallet.position.distance) / 1000)
+            robot.forward(((pallet.position.distance) / 1000) - 0.2)
+
+            print("I think I've arrived at", pallet)
             state = RobotState.GRABBING
 
     elif (state == RobotState.GRABBING):
@@ -127,4 +139,5 @@ while runningCompetition:
         robot.place()
         robot.reverse(1)
         state = RobotState.LOOKING_FOR_CUBES
+
 sys.exit(0)
