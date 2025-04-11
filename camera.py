@@ -47,9 +47,11 @@ class MyRobotCamera:
                 highRiseMarkers.append(marker)
 
         # sorts highRiseMarkers into least to highest distance
-        for i in range(len(highRiseMarkers) - 1):
+        highRiseMarkers.sort(key=lambda m: m.position.distance)
+
+        '''for i in range(len(highRiseMarkers) - 1):
             if highRiseMarkers[i].position.distance > highRiseMarkers[i + 1].position.distance:
-                highRiseMarkers[i], highRiseMarkers[i + 1] = highRiseMarkers[i + 1], highRiseMarkers[i]
+                highRiseMarkers[i], highRiseMarkers[i + 1] = highRiseMarkers[i + 1], highRiseMarkers[i]'''
         
         return highRiseMarkers
 
@@ -75,10 +77,12 @@ class MyRobotCamera:
     def find_all_markers(self):
         markers = self.ROBOT.camera.see()
 
+        markers.sort(key=lambda m: m.position.distance)
+
         # sorts markers into least to highest distance
-        for i in range(len(markers) - 1):
+        '''for i in range(len(markers) - 1):
             if markers[i].position.distance > markers[i + 1].position.distance:
-                markers[i], markers[i + 1] = markers[i + 1], markers[i]
+                markers[i], markers[i + 1] = markers[i + 1], markers[i]'''
         
         return markers
 
