@@ -17,6 +17,10 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(880, 0.1, 0.05) #A
         robot.beep_sync(880, 0.3, 0.05) #A
         robot.sleep(1)
+
+    def drive_reverse(self):
+        robot.reverse(0.5)
+
           
     def drive_back_forwards(self):
         """Drive forwards, turn around, drive backwards.
@@ -92,7 +96,7 @@ class TestRobot(unittest.TestCase):
 
     def rotate_20(self):
         for i in range(18):
-            robot.right(20)
+            robot.right(16.6)
     
     def pump_on_off(self):
         """Turn on pump for ten seconds then turn it off.

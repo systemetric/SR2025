@@ -57,23 +57,34 @@ class MyRobot:
         return (1- self.__INIT_PWR)/(endCount) * currentCount + self.__INIT_PWR
     
     def __powerByCount(self, pCount, pidObject, tCount, rot):
-        return pidObject(pCount) * (self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount) if pCount < tCount * self.__ACCEL_CONST and not rot else (self.__ROT_FAC if rot else 1))
+        fac = 1
+        if abs(pCount) < abs(tCount * self.__ACCEL_CONST) and not rot:
+            fac = self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount)
+        elif rot:
+            fac = self.__ROT_FAC
 
-    def __count_correct(self, m0Count, m1Count):
-        # MAYBE BAD
+        print(f"Factor: {fac}\n")
+
+        return pidObject(pCount) * fac
+
+    def __count_correct(self, m0Count, m1Count, target):
+        # MAYBE BAD      
         m0Count, m1Count = abs(m0Count), abs(m1Count)
 
         countDelta = abs(m0Count - m1Count)
         factor = self.__clamp(0, 1 - countDelta / 100, 1)
 
         print(f"cd: {countDelta}, f: {factor}")
-
+        res = [1,1]
         if m0Count > m1Count:
-            self.__M0FAC, self.__M1FAC = factor, 1
+            res = factor, 1
         elif m0Count < m1Count:
-            self.__M0FAC, self.__M1FAC = 1, factor
-        else:
-            self.__M0FAC, self.__M1FAC = 1, 1
+            res = 1, factor
+        
+        if target < 0:
+            res = res[::-1]
+
+        self.__M0FAC, self.__M1FAC = res
 
     def __RobotDrive(self, pDistance, rotate=False, rotateFactor=1):
         self.__M0FAC = 1
@@ -137,7 +148,7 @@ class MyRobot:
             m0χ, m1χ = m0δ / δt, m1δ / δt
 
            # if not rotate:
-            self.__count_correct(m0Count, m1Count)
+            self.__count_correct(m0Count, m1Count, targetCount)
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
                 self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID, targetCount, rotate))
@@ -168,7 +179,7 @@ class MyRobot:
     def __RobotRotate(self, pAngle, SPECIAL_κ):
         fac = 1
 
-        if pAngle < 180:
+        if pAngle < 180 and pAngle >= 20:
             fac = 0.5
 
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
