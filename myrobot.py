@@ -38,6 +38,8 @@ class MyRobot:
         dbgPassThrough=False,
         noAccel=False,
     ):
+        self.__start_epoch = time.time()
+
         self.__REVOL_DIST = revolDist
         self.__TARGET_MOTORS = targetMotors
         self.__ACCURACY = accuracy
@@ -498,3 +500,9 @@ class MyRobot:
 
         print("Drive: arrived.")
         return True
+
+    def get_seconds_passed(self):
+        return int(time.time() - self.__start_epoch)
+    
+    def get_seconds_remaining(self):
+        return (150 - self.get_seconds_passed())

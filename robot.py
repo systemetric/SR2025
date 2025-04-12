@@ -42,12 +42,12 @@ if TESTING:
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
     # unittest.main exists after completion
 
-# LAC Stop smart
-# LAC Async
+# LAC Stop smart **
+# LAC Async **
 # LAC Part lift
-# Reduce reverse distance
-# Reduce threshold for slow drive
-# Time game round for centre knock
+# Reduce reverse distance **
+# Reduce threshold for slow drive **
+# Time game round for centre knock 
 
 robot = MyRobot(accuracy=40, dbgEnabled=False)
 
@@ -73,6 +73,7 @@ state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
 while runningCompetition:
     print("Current state:", state)
+    print("Seconds left:", robot.get_seconds_remaining())
     print("Delivered Markers", delivered_markers)
 
     if state == RobotState.LOOKING_FOR_CUBES:
