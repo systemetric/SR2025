@@ -73,7 +73,7 @@ while runningCompetition:
         
         # if we have turned all the way around, not found anything, reverse.
         if total_search_rotation > 360:
-            print("Nothing found, reversing.")
+            print("No pallets we are interested in could be found, reversing.")
             robot.reverse(0.5)
             total_search_rotation = 0
 
@@ -82,7 +82,7 @@ while runningCompetition:
             total_search_rotation += 20
         
         else:
-            # CUBE FOUND!!
+            print("Pallet found.")
             total_search_rotation = 0
 
             pallet = pallet_markers[0]
@@ -98,7 +98,19 @@ while runningCompetition:
         print("Grabbing pallet...")
         robot.grab()
 
-        if (robot.pump_grabbing_noise_based()):
+        '''
+        ||||
+        ||||
+        ||||
+        ||||
+
+        ||||
+
+        Please uncomment the pump grabbing code for the competition!
+        
+        '''
+
+        '''if (robot.pump_grabbing_noise_based()):
             visitedMarkers.append(pallet)
             print("Grabbed pallet :)")
             state = RobotState.LOOKING_FOR_DISTRICT
@@ -106,7 +118,11 @@ while runningCompetition:
             print("Cube grab failed. Restarting...")
             robot.drop()
             robot.reverse(0.5)
-            state = RobotState.LOOKING_FOR_CUBES
+            state = RobotState.LOOKING_FOR_CUBES'''
+
+        visitedMarkers.append(pallet)
+        print("Added pallet to visited markers. Not checking for pallet actually grabbed!")
+        state = RobotState.LOOKING_FOR_DISTRICT
     
     elif (state == RobotState.LOOKING_FOR_DISTRICT):
         # camera find all markers
