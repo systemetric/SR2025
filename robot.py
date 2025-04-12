@@ -41,6 +41,13 @@ if TESTING:
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
     # unittest.main exists after completion
 
+# LAC Stop smart
+# LAC Async
+# LAC Part lift
+# Reduce reverse distance
+# Reduce threshold for slow drive
+# Time game round for centre knock
+
 robot = MyRobot(accuracy=40, dbgEnabled=False)
 
 TARGET_HIGHRISE = 195 + robot.zone
@@ -148,18 +155,21 @@ while runningCompetition:
         pallet_on_plinth = robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE)
 
         if plinth and pallet_on_plinth:
+            print("Stacked plinth")
             if not robot.drive_to(plinth, minus=0.2):
                 print("Couldn't find plinth")
                 robot.right(30)
                 continue
             state = RobotState.PLACE
         elif plinth:
+            print("Clear plinth")
             if not robot.drive_to(plinth):
                 print("Couldn't find plinth")
                 robot.right(30)
                 continue
             state = RobotState.PLACE
         else:
+            print("General area")
             # go to a marker we've already moved (it must be near the highrise as we've moved it previously.)
             target = None
             for marker in markers:
