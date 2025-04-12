@@ -6,8 +6,9 @@ import enum
 # Uncomment the test you want to run.
 # Tests are defined as functions in tests.py
 
-TESTING = False
+TESTING = True
 tests_to_run = [
+    "drive_for_scores"
     # "drive_back_forwards",
     # "lots_of_rotation_left",
     # "lots_of_rotation_right",

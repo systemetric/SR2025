@@ -368,27 +368,36 @@ class MyRobot:
 
     def drive_to(self, target_marker) -> bool:
         if target_marker.position.distance > 1000:
-            self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.75)
+            self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.5)
             visible_markers = self.camera.find_all_markers()
+            print("Visible markers:", visible_markers)
 
             if not self.marker_list_contains_id(visible_markers, target_marker):
+                print("Lost sight, searching for marker.")
                 self.right(15)
                 visible_markers = self.camera.find_all_markers()
+                print("Visible markers:", visible_markers)
 
                 if not self.marker_list_contains_id(visible_markers, target_marker):
+                    print("Lost sight, trying other direction")
                     self.left(30)
                     visible_markers = self.camera.find_all_markers()
+                    print("Visible markers:", visible_markers)
 
                     if not self.marker_list_contains_id(visible_markers, target_marker):
+                        print("Failed to drive to marker.")
                         return False
             
             new_target_marker = self.marker_list_get_marker_with_id(
                 visible_markers, target_marker.id
             )
+            print("New marker info:", new_target_marker)
 
             self.right(new_target_marker.position.horizontal_angle, True)
             self.forward((new_target_marker.position.distance / 1000) - 0.2)
         else:
             self.right(target_marker.position.horizontal_angle, True)
             self.forward((target_marker.position.distance / 1000) - 0.2)
+        
+        print("Drive: arrived.")
         return True

@@ -17,6 +17,9 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(880, 0.1, 0.05) #A
         robot.beep_sync(880, 0.3, 0.05) #A
         robot.sleep(1)
+    
+    def drive_for_scores(self):
+        robot.forward(1)
 
     def drive_reverse(self):
         robot.reverse(0.5)
