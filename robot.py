@@ -48,6 +48,7 @@ print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
 
 runningCompetition = True
 delivered_markers = []
+turn_dir = 1
 
 
 class RobotState(enum.Enum):
@@ -55,6 +56,7 @@ class RobotState(enum.Enum):
     GRABBING = enum.auto()
     LOOKING_FOR_DISTRICT = enum.auto()
     PLACE = enum.auto()
+
 
 robot.forward(1)
 
@@ -75,7 +77,7 @@ while runningCompetition:
             robot.reverse(1)
             total_search_rotation = 0
             continue
-        
+
         markers = filter(lambda x: x.id not in delivered_markers, markers)
 
         pallet_markers = robot.camera.check_if_markers_are_our_pallets(
@@ -110,7 +112,7 @@ while runningCompetition:
         print("Grabbing pallet...")
         robot.grab()
 
-        if (robot.pump_grabbing_noise_based()):
+        if robot.pump_grabbing_noise_based():
             delivered_markers.append(pallet.id)
             print("Grabbed pallet :)")
             robot.reverse(1)
@@ -121,14 +123,14 @@ while runningCompetition:
             robot.reverse(1)
             state = RobotState.LOOKING_FOR_CUBES
 
-        '''
+        """
         *** HOTEL ROOM TESTING CODE: ***   
             
         visitedMarkers.append(pallet)
         print(
             "Added pallet to visited markers. Not checking for pallet actually grabbed!"
         )
-        state = RobotState.LOOKING_FOR_DISTRICT'''
+        state = RobotState.LOOKING_FOR_DISTRICT"""
 
     elif state == RobotState.LOOKING_FOR_DISTRICT:
         # camera find all markers
@@ -144,7 +146,7 @@ while runningCompetition:
         print("Plinth found:", plinth)
 
         pallet_on_plinth = robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE)
-        
+
         if plinth and pallet_on_plinth:
             if not robot.drive_to(plinth, minus=0.2):
                 print("Couldn't find plinth")
@@ -167,7 +169,7 @@ while runningCompetition:
 
             # turn if nothing found
             if not target:
-                robot.right(20)
+                robot.right(20 * turn_dir)
             else:
                 # go to target place cube
                 if not robot.drive_to(target):
@@ -179,6 +181,7 @@ while runningCompetition:
     elif state == RobotState.PLACE:
         robot.place()
         robot.reverse(1)
+        turn_dir = -1
         state = RobotState.LOOKING_FOR_CUBES
 
 sys.exit(0)
