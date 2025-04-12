@@ -340,3 +340,37 @@ class MyRobot:
 
     def see_and_capture(self, f):
         return self.ROBOT.camera.see(save=f)
+    
+    def marker_list_contains_id(self, marker_list:list, marker) -> bool:
+        return self.marker_list_get_marker_with_id(marker_list, marker.id) != None
+    
+    def marker_list_get_marker_with_id(self, marker_list: list, marker_id):
+        for m in marker_list:
+            if m.id == marker_id:
+                return m
+        return None
+
+    def drive_to(self, target_marker) -> bool:
+        if target_marker.position.distance > 1000:
+            self.forward(target_marker.position.distance * 0.75)
+            visible_markers = self.camera.find_all_markers()
+            if self.marker_list_contains_id(visible_markers, target_marker):
+                self.right(15)
+                visible_markers = self.camera.find_all_markers()
+                if self.marker_list_contains_id(visible_markers, target_marker):
+                    self.left(30)
+                    visible_markers = self.camera.find_all_markers()
+                    if self.marker_list_contains_id(visible_markers, target_marker):
+                        return False
+            new_target_marker = self.marker_list_get_marker_with_id(visible_markers, target_marker)
+            self.right(new_target_marker.position.horizontal_angle, True)
+            self.forward(new_target_marker.position.distance / 1000 - 0.2)
+        else:
+            self.right(target_marker.position.horizontal_angle, True)
+            self.forward(new_target_marker.position.distance / 1000 - 0.2)
+
+
+
+            
+
+            

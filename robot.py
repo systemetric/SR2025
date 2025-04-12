@@ -6,13 +6,13 @@ import enum
 # Uncomment the test you want to run.
 # Tests are defined as functions in tests.py
 
-TESTING = True
+TESTING = False
 tests_to_run = [
     #"drive_back_forwards",
     #"lots_of_rotation_left",
     #"lots_of_rotation_right",
     #"rotate_20",
-    "drive_full",
+    # "drive_full",
     #"drive_reverse",
     #"drive_back_forwards",
     #"drive_back_forwards",
@@ -62,12 +62,24 @@ while runningCompetition:
         # find a pallet marker to navigate to
         # |  || || |_
         markers = robot.camera.find_all_markers()
+        print("Markers:", markers)
+
+        '''
+        ||||
+        ||||
+        ||||
+        ||||
+
+        ||||
+
+        Please uncomment the following for the competition!
 
         if len(markers) == 0:
             print("No markers found. Reversing.")
             robot.reverse(1)
             total_search_rotation = 0
             continue
+        '''
 
         pallet_markers = robot.camera.check_if_markers_are_our_pallets(markers, ignored_markers=visitedMarkers)
         
@@ -88,6 +100,29 @@ while runningCompetition:
             pallet = pallet_markers[0]
             print("Going to", pallet)
 
+            robot.right(pallet.position.horizontal_angle, isRadians=True)
+            
+            # stop and re-calibrate at half way if we are further than a meter away from target.
+            if pallet.position.distance > 1000:
+                robot.forward((((pallet.position.distance) / 1000) - 0.15) * 0.5)
+
+                print("stopping and correcting...")
+                markers = robot.camera.find_all_markers()
+                pallet_changed = False
+
+                for m in markers:
+                    if m.id == pallet.id:
+                        pallet = m
+                        pallet_changed = True
+                        print("Updated pallet:", pallet)
+                        break
+                
+                if not pallet_changed:
+                    print("Aborting, can't find pallet anymore!")
+                    continue
+            else:
+                robot.forward(((pallet.position.distance) / 1000) - 0.15)
+            
             robot.right(pallet.position.horizontal_angle, isRadians=True)
             robot.forward(((pallet.position.distance) / 1000) - 0.15)
 
