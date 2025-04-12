@@ -93,13 +93,16 @@ while runningCompetition:
             pallet = pallet_markers[0]
             print("Going to", pallet)
 
-            robot.drive_to(pallet)
+            driven_to_cube = robot.drive_to(pallet)
 
-            robot.right(pallet.position.horizontal_angle, isRadians=True)
-            robot.forward(((pallet.position.distance) / 1000) - 0.15)
+            if driven_to_cube:
+                robot.right(pallet.position.horizontal_angle, isRadians=True)
+                robot.forward(((pallet.position.distance) / 1000) - 0.15)
 
-            print("I think I've arrived at", pallet)
-            state = RobotState.GRABBING
+                print("I think I've arrived at", pallet)
+                state = RobotState.GRABBING
+            else:
+                print("Not arrived at cube.")
 
     elif state == RobotState.GRABBING:
         print("Grabbing pallet...")

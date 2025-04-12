@@ -371,15 +371,15 @@ class MyRobot:
             self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.75)
             visible_markers = self.camera.find_all_markers()
 
-            if self.marker_list_contains_id(visible_markers, target_marker):
+            if not self.marker_list_contains_id(visible_markers, target_marker):
                 self.right(15)
                 visible_markers = self.camera.find_all_markers()
 
-                if self.marker_list_contains_id(visible_markers, target_marker):
+                if not self.marker_list_contains_id(visible_markers, target_marker):
                     self.left(30)
                     visible_markers = self.camera.find_all_markers()
 
-                    if self.marker_list_contains_id(visible_markers, target_marker):
+                    if not self.marker_list_contains_id(visible_markers, target_marker):
                         return False
             
             new_target_marker = self.marker_list_get_marker_with_id(
@@ -391,3 +391,4 @@ class MyRobot:
         else:
             self.right(target_marker.position.horizontal_angle, True)
             self.forward((target_marker.position.distance / 1000) - 0.2)
+        return True
