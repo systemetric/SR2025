@@ -4,7 +4,7 @@ import util
 from datetime import datetime
 from pid import PID
 from camera import *
-
+import os
 
 class MyRobot:
     __TARGET_MOTORS = [0, 1]
@@ -57,7 +57,12 @@ class MyRobot:
         self.DEBUGGER = util.MyRobotDebug(enable=dbgEnabled, passThrough=dbgPassThrough)
         self.camera = MyRobotCamera(self.ROBOT, self.zone)
 
-        self.scissor_up()
+        self.start_scissor_up()
+        # self.scissor_up()
+
+        print("Taking a cheeky lil' snooze...")
+        self.sleep(1)
+        print("Ok done, let's go girls!")
 
     def __del__(self):
         self.DEBUGGER.stop()
@@ -248,6 +253,8 @@ class MyRobot:
             # print(message)
             # self.DEBUGGER.debug(message)
             message = ""
+
+            self.tick_scissor_complete()
             time.sleep(0.005)
 
         self.stop()
@@ -294,6 +301,8 @@ class MyRobot:
         self.__PUMP_MB.motors[0].power = -1 if enabled else 0
 
     def scissor_up(self, dur=-1):
+        # BLOCKERING SCISSERING
+        self.async_scissoring = False
         print("Scissor going up...")
         self.__setLacState(1)
         if dur >= 0:
@@ -305,6 +314,9 @@ class MyRobot:
         print("Scissor is up.")
 
     def scissor_down(self, dur=-1):
+        # BLOCKERING SCISSERING
+        self.async_scissoring = False
+        
         print("Scissor going down...")
         self.__setLacState(-1)
         if dur >= 0:
@@ -315,6 +327,23 @@ class MyRobot:
         self.__setLacState(0)
         print("Scissor down.")
 
+    def scissor_down_carefully(self):
+        self.async_scissoring = False
+        print("Scissor going down carefully")
+
+        self.__setLacState(-1)
+        self.sleep(1)
+        while self.__getLacCurrentDraw() < 0.001:
+            self.sleep(0.1)
+        self.__setLacState(0)
+        print("Scissor stopped.")
+    
+    def async_grab_carefully(self):
+        self.pump = True
+        self.scissor_down_carefully()
+        self.sleep(1)
+        self.start_scissor_up(3)
+
     async_scissoring = False
 
     def start_scissor_up(self, dur=0):
@@ -324,17 +353,18 @@ class MyRobot:
         self.sleep(dur)
 
     def await_scissor_complete(self):
-        if not self.async_scissoring:
-            print("Awaiting but not running?")
-        else:
+        if self.async_scissoring:
             print("Awaiting scissor done.")
             while self.__getLacCurrentDraw() < 0.2:
                 self.sleep(0.1)
             self.__setLacState(0)
             self.async_scissoring = False
+        else:
+            print("Awaiting but not running?")
 
     def tick_scissor_complete(self):
         if self.async_scissoring and self.__getLacCurrentDraw() > 0.2:
+            print("Ticky stoppped lac.")
             self.__setLacState(0)
             self.async_scissoring = False
 
@@ -385,14 +415,27 @@ class MyRobot:
         self.scissor_down()
         self.sleep(1)
         self.scissor_up()
+    
+    def async_grab(self):
+        self.pump = True
+        self.scissor_down()
+        self.sleep(1)
+        self.start_scissor_up()
+        self.sleep(2)
 
     def drop(self):
         self.pump = False
 
     def place(self):
-        self.scissor_down()
+        self.scissor_down_carefully()
         self.pump = False
-        self.scissor_up()
+        self.start()
+    
+    def async_place(self):
+        self.scissor_down_carefully()
+        self.pump = False
+        self.start_scissor_up()
+        self.sleep(4)
 
     def beep(self, hz=440, dur=0.1):
         self.ROBOT.power_board.piezo.buzz(hz, dur)

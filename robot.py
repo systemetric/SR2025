@@ -8,7 +8,7 @@ import enum
 
 TESTING = False
 tests_to_run = [
-    "drive_for_scores"
+    # "drive_for_scores"
     # "drive_back_forwards",
     # "lots_of_rotation_left",
     # "lots_of_rotation_right",
@@ -25,14 +25,15 @@ tests_to_run = [
     # "stand_and_deliver",
     # "full_scissor_test",
     # "pump_read_current",
-    # "scissor_read_current",
+    "scissor_read_current",
     # "rickroll",
     # "motor_challenge",
     # "play_fetch",
     # "pump_toggler"
     # "back_forwards_12_billion",
     # "up_down_12_billion",
-    # "game_tests"
+    # "game_tests",
+    # "log_lac_values"
 ]
 
 if TESTING:
@@ -63,9 +64,10 @@ class RobotState(enum.Enum):
     GRABBING = enum.auto()
     LOOKING_FOR_DISTRICT = enum.auto()
     PLACE = enum.auto()
-
-
+    
 robot.forward(1)
+# after we've driven, wait for the arm to finish raising.
+# robot.await_scissor_complete()
 
 state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
@@ -117,27 +119,29 @@ while runningCompetition:
 
     elif state == RobotState.GRABBING:
         print("Grabbing pallet...")
-        robot.grab()
+        robot.async_grab_carefully()
 
+        '''
         if robot.pump_grabbing_noise_based():
             delivered_markers.append(pallet.id)
             print("Grabbed pallet :)")
-            robot.reverse(1)
+            robot.reverse(0.6)
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
             robot.drop()
-            robot.reverse(1)
+            robot.reverse(0.6)
             state = RobotState.LOOKING_FOR_CUBES
-
-        """
-        *** HOTEL ROOM TESTING CODE: ***   
-            
-        visitedMarkers.append(pallet)
+        
+        *** HOTEL ROOM TESTING CODE: ***  
+        Swap the below with the above! 
+        '''
+        robot.reverse(0.6)
+        delivered_markers.append(pallet.id)
         print(
             "Added pallet to visited markers. Not checking for pallet actually grabbed!"
         )
-        state = RobotState.LOOKING_FOR_DISTRICT"""
+        state = RobotState.LOOKING_FOR_DISTRICT
 
     elif state == RobotState.LOOKING_FOR_DISTRICT:
         # camera find all markers
@@ -189,8 +193,9 @@ while runningCompetition:
                 state = RobotState.PLACE
 
     elif state == RobotState.PLACE:
-        robot.place()
-        robot.reverse(1)
+        robot.async_place()
+        # robot.async_place()
+        robot.reverse(0.6)
         turn_dir = -1
         state = RobotState.LOOKING_FOR_CUBES
 
