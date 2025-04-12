@@ -11,9 +11,9 @@ class MyRobotCamera:
         self.__NEXT_OBJ = self.__MARKER_PALLET
         self.zone = zone
 
-    def find_pallet_markers(self, ignored_markers:list = []):
+    def check_if_markers_are_our_pallets(self, markers, ignored_markers:list = []):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
-        markers = self.ROBOT.camera.see()
+        # markers = self.ROBOT.camera.see()
 
         MIN_PALLET = (self.zone * 20) + 100
         MAX_PALLET = MIN_PALLET + 19
@@ -56,6 +56,7 @@ class MyRobotCamera:
         return highRiseMarkers
 
     def is_pallet_on_plinth(self, markers: list, plinth_id: int) -> bool:
+        # use our list of passed in markers to check if a pallet is present on the plinth.
         plinth = None
         
         for marker in markers:
@@ -66,6 +67,7 @@ class MyRobotCamera:
         if plinth == None:
             return False
         
+        # if the marker is between the left and right boundaries of the plinth, it is on the plinth.
         for marker in markers:
             plinth_scaled_angle = plinth.position.horizontal_angle / plinth.position.distance
             marker_scaled_angle = marker.position.horizontal_angle / marker.position.distance

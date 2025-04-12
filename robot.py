@@ -55,31 +55,41 @@ class RobotState(enum.Enum):
 
 state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
-
 while runningCompetition:
     print("Current state:", state)
 
     if (state == RobotState.LOOKING_FOR_CUBES):
         # find a pallet marker to navigate to
         # |  || || |_
-        pallet_markers = robot.camera.find_pallet_markers(ignored_markers=visitedMarkers)
+        markers = robot.camera.find_all_markers()
+
+        if len(markers) == 0:
+            print("No markers found. Reversing.")
+            robot.reverse(1)
+            total_search_rotation = 0
+            continue
+
+        pallet_markers = robot.camera.check_if_markers_are_our_pallets(markers, ignored_markers=visitedMarkers)
         
         # if we have turned all the way around, not found anything, reverse.
         if total_search_rotation > 360:
+            print("Nothing found, reversing.")
             robot.reverse(0.5)
             total_search_rotation = 0
 
         if len(pallet_markers) == 0:
             robot.right(20)
             total_search_rotation += 20
+        
         else:
+            # CUBE FOUND!!
             total_search_rotation = 0
 
             pallet = pallet_markers[0]
             print("Going to", pallet)
 
             robot.right(pallet.position.horizontal_angle, isRadians=True)
-            robot.forward(((pallet.position.distance) / 1000) - 0.2)
+            robot.forward(((pallet.position.distance) / 1000) - 0.15)
 
             print("I think I've arrived at", pallet)
             state = RobotState.GRABBING
@@ -99,39 +109,39 @@ while runningCompetition:
             state = RobotState.LOOKING_FOR_CUBES
     
     elif (state == RobotState.LOOKING_FOR_DISTRICT):
+        # camera find all markers
         markers = robot.camera.find_all_markers()
 
+        # look for our high rise
         plinth = None
         for marker in markers:
             if marker.id == TARGET_HIGHRISE:
                 plinth = marker
                 break
-
-        if robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            # get high rise marker info
-            for marker in markers:
-                if marker.id == TARGET_HIGHRISE:
-                    highrise = marker
-                    break
-
-            robot.right(highrise.position.horizontal_angle, isRadians=True)
-            robot.forward(((highrise.position.distance) / 1000) - 0.2)
-            state = RobotState.PLACE
         
-        elif plinth:
+        print("Plinth found:", plinth)
+
+        if plinth and robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
+            robot.right(plinth.position.horizontal_angle, isRadians=True)
+            robot.forward(((plinth.position.distance) / 1000) - 0.2)
+            state = RobotState.PLACE
+        elif plinth and not robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
             robot.right(plinth.position.horizontal_angle, isRadians=True)
             robot.forward(((plinth.position.distance) / 1000))
             state = RobotState.PLACE
         else:
+            # go to a marker we've already moved (it must be near the highrise as we've moved it previously.)
             target = None
             for marker in markers:
                 if marker.id in visitedMarkers:
                     target = marker
                     break
             
+            # turn if nothing found
             if not target:
                 robot.right(15)
             else:
+                # go to target place cube
                 robot.right(target.position.horizontal_angle, isRadians=True)
                 robot.forward(((target.position.distance) / 1000))
                 state = RobotState.PLACE
