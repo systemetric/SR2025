@@ -352,7 +352,7 @@ class MyRobot:
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance < 1:
+        if distance < 0.6:
             self.__RobotDrive(distance, dampenFactor=0.5)
         else:
             self.__RobotDrive(distance)
@@ -361,7 +361,7 @@ class MyRobot:
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance > -1:
+        if distance > -0.6:
             self.__RobotDrive(-distance, dampenFactor=0.5)
         else:
             self.__RobotDrive(-distance)
