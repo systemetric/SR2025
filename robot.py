@@ -47,7 +47,7 @@ if TESTING:
 # LAC Part lift
 # Reduce reverse distance **
 # Reduce threshold for slow drive **
-# Time game round for centre knock 
+# Time game round for centre knock **
 
 robot = MyRobot(accuracy=40, dbgEnabled=False)
 
