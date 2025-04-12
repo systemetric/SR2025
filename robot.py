@@ -43,7 +43,7 @@ if TESTING:
 robot = MyRobot(accuracy=10, dbgEnabled=False)
 
 TARGET_HIGHRISE = 195 + robot.zone
-print("Hello! I'm looking for high rise:", TARGET_HIGHRISE)
+print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
 
 runningCompetition = True
 visitedMarkers = []
@@ -67,22 +67,11 @@ while runningCompetition:
         markers = robot.camera.find_all_markers()
         print("Markers:", markers)
 
-        """
-        ||||
-        ||||
-        ||||
-        ||||
-
-        ||||
-
-        Please uncomment the following for the competition!
-
         if len(markers) == 0:
-            print("No markers found. Reversing.")
+            print("No markers found. Reversing 1m.")
             robot.reverse(1)
             total_search_rotation = 0
             continue
-        """
 
         pallet_markers = robot.camera.check_if_markers_are_our_pallets(
             markers, ignored_markers=visitedMarkers
@@ -116,19 +105,7 @@ while runningCompetition:
         print("Grabbing pallet...")
         robot.grab()
 
-        """
-        ||||
-        ||||
-        ||||
-        ||||
-
-        ||||
-
-        Please uncomment the pump grabbing code for the competition!
-        
-        """
-
-        """if (robot.pump_grabbing_noise_based()):
+        if (robot.pump_grabbing_noise_based()):
             visitedMarkers.append(pallet)
             print("Grabbed pallet :)")
             state = RobotState.LOOKING_FOR_DISTRICT
@@ -136,13 +113,16 @@ while runningCompetition:
             print("Cube grab failed. Restarting...")
             robot.drop()
             robot.reverse(0.5)
-            state = RobotState.LOOKING_FOR_CUBES"""
+            state = RobotState.LOOKING_FOR_CUBES
 
+        '''
+        *** HOTEL ROOM TESTING CODE: ***   
+            
         visitedMarkers.append(pallet)
         print(
             "Added pallet to visited markers. Not checking for pallet actually grabbed!"
         )
-        state = RobotState.LOOKING_FOR_DISTRICT
+        state = RobotState.LOOKING_FOR_DISTRICT'''
 
     elif state == RobotState.LOOKING_FOR_DISTRICT:
         # camera find all markers
