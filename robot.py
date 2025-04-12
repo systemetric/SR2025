@@ -41,7 +41,7 @@ if TESTING:
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
     # unittest.main exists after completion
 
-robot = MyRobot(accuracy=30, dbgEnabled=False)
+robot = MyRobot(accuracy=40, dbgEnabled=False)
 
 TARGET_HIGHRISE = 195 + robot.zone
 print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
