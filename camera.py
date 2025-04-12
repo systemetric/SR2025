@@ -76,7 +76,7 @@ class MyRobotCamera:
         
         return False
 
-    def find_all_markers(self):
+    def find_all_markers(self) -> list:
         markers = self.ROBOT.camera.see()
 
         markers.sort(key=lambda m: m.position.distance)

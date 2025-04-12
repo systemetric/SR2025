@@ -368,7 +368,7 @@ class MyRobot:
 
     def drive_to(self, target_marker) -> bool:
         if target_marker.position.distance > 1000:
-            self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.5)
+            self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.75)
             visible_markers = self.camera.find_all_markers()
             print("Visible markers:", visible_markers)
 
@@ -394,10 +394,10 @@ class MyRobot:
             print("New marker info:", new_target_marker)
 
             self.right(new_target_marker.position.horizontal_angle, True)
-            self.forward((new_target_marker.position.distance / 1000) - 0.2)
+            self.forward((new_target_marker.position.distance / 1000) - 0.1)
         else:
             self.right(target_marker.position.horizontal_angle, True)
-            self.forward((target_marker.position.distance / 1000) - 0.2)
+            self.forward((target_marker.position.distance / 1000) - 0.1)
         
         print("Drive: arrived.")
         return True

@@ -6,7 +6,7 @@ import enum
 # Uncomment the test you want to run.
 # Tests are defined as functions in tests.py
 
-TESTING = True
+TESTING = False
 tests_to_run = [
     "drive_for_scores"
     # "drive_back_forwards",
@@ -41,7 +41,7 @@ if TESTING:
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
     # unittest.main exists after completion
 
-robot = MyRobot(accuracy=10, dbgEnabled=False)
+robot = MyRobot(accuracy=30, dbgEnabled=False)
 
 TARGET_HIGHRISE = 195 + robot.zone
 print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
@@ -56,6 +56,7 @@ class RobotState(enum.Enum):
     LOOKING_FOR_DISTRICT = enum.auto()
     PLACE = enum.auto()
 
+robot.forward(1)
 
 state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
@@ -65,7 +66,7 @@ while runningCompetition:
     if state == RobotState.LOOKING_FOR_CUBES:
         # find a pallet marker to navigate to
         # |  || || |_
-        markers = robot.camera.find_all_markers()
+        markers: list = robot.camera.find_all_markers()
         print("Markers:", markers)
 
         if len(markers) == 0:
@@ -73,6 +74,8 @@ while runningCompetition:
             robot.reverse(1)
             total_search_rotation = 0
             continue
+        
+        markers = filter(lambda x: x.id not in visitedMarkers, markers)
 
         pallet_markers = robot.camera.check_if_markers_are_our_pallets(
             markers, ignored_markers=visitedMarkers
@@ -97,9 +100,6 @@ while runningCompetition:
             driven_to_cube = robot.drive_to(pallet)
 
             if driven_to_cube:
-                robot.right(pallet.position.horizontal_angle, isRadians=True)
-                robot.forward(((pallet.position.distance) / 1000) - 0.15)
-
                 print("I think I've arrived at", pallet)
                 state = RobotState.GRABBING
             else:
@@ -110,13 +110,14 @@ while runningCompetition:
         robot.grab()
 
         if (robot.pump_grabbing_noise_based()):
-            visitedMarkers.append(pallet)
+            visitedMarkers.append(pallet.id)
             print("Grabbed pallet :)")
+            robot.reverse(1)
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
             robot.drop()
-            robot.reverse(0.5)
+            robot.reverse(1)
             state = RobotState.LOOKING_FOR_CUBES
 
         '''
@@ -142,12 +143,10 @@ while runningCompetition:
         print("Plinth found:", plinth)
 
         if plinth and robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            robot.right(plinth.position.horizontal_angle, isRadians=True)
-            robot.forward(((plinth.position.distance) / 1000) - 0.2)
+            robot.drive_to(plinth)
             state = RobotState.PLACE
         elif plinth and not robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            robot.right(plinth.position.horizontal_angle, isRadians=True)
-            robot.forward(((plinth.position.distance) / 1000))
+            robot.drive_to(plinth)
             state = RobotState.PLACE
         else:
             # go to a marker we've already moved (it must be near the highrise as we've moved it previously.)
@@ -168,6 +167,7 @@ while runningCompetition:
 
     elif state == RobotState.PLACE:
         robot.place()
+        sys.exit(0)
         robot.reverse(1)
         state = RobotState.LOOKING_FOR_CUBES
 
