@@ -22,7 +22,7 @@ class MyRobotCamera:
 
         palletMarkers = []
         for marker in markers:
-            if marker.id >= 100 and marker.id <= 179 and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
+            if marker.id >= MIN_PALLET and marker.id <= MAX_PALLET and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
                 palletMarkers.append(marker)
 
         # sorts palletMarkers into least to highest distance
@@ -69,9 +69,7 @@ class MyRobotCamera:
         
         # if the marker is between the left and right boundaries of the plinth, it is on the plinth.
         for marker in markers:
-            plinth_scaled_angle = plinth.position.horizontal_angle / plinth.position.distance
-            marker_scaled_angle = marker.position.horizontal_angle / marker.position.distance
-            if marker.id != plinth_id and marker_scaled_angle >= plinth_scaled_angle - 0.1 and marker_scaled_angle <= plinth_scaled_angle + 0.1 and marker.position.vertical_angle > plinth.position.vertical_angle:
+            if marker.position.vertical_angle > plinth.position.vertical_angle + 0.1:
                 return True
         
         return False

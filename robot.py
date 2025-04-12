@@ -62,6 +62,7 @@ state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
 while runningCompetition:
     print("Current state:", state)
+    print("Delivered Markers", delivered_markers)
 
     if state == RobotState.LOOKING_FOR_CUBES:
         # find a pallet marker to navigate to
@@ -116,7 +117,7 @@ while runningCompetition:
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
-            robot.place()
+            robot.drop()
             robot.reverse(1)
             state = RobotState.LOOKING_FOR_CUBES
 
@@ -142,14 +143,15 @@ while runningCompetition:
 
         print("Plinth found:", plinth)
 
-        if plinth and robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            if not robot.drive_to(plinth):
+        pallet_on_plinth = robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE)
+        
+        if plinth and pallet_on_plinth:
+            if not robot.drive_to(plinth, minus=0.2):
                 print("Couldn't find plinth")
                 robot.right(30)
                 continue
-            robot.reverse(0.2)
             state = RobotState.PLACE
-        elif plinth and not robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
+        elif plinth:
             if not robot.drive_to(plinth):
                 print("Couldn't find plinth")
                 robot.right(30)
@@ -165,7 +167,7 @@ while runningCompetition:
 
             # turn if nothing found
             if not target:
-                robot.right(15)
+                robot.right(20)
             else:
                 # go to target place cube
                 if not robot.drive_to(target):

@@ -99,7 +99,7 @@ class MyRobot:
         countDelta = abs(m0Count - m1Count)
         factor = self.__clamp(0, 1 - countDelta / 100, 1)
 
-        print(f"cd: {countDelta}, f: {factor}")
+        # print(f"cd: {countDelta}, f: {factor}")
         res = [1,1]
         if m0Count > m1Count:
             res = [factor, 1]
@@ -123,7 +123,7 @@ class MyRobot:
         # Calculate target
         targetCount = int(self.__COUNTS_PER_REVOL * pDistance / self.__REVOL_DIST)
 
-        print(f"Going to {targetCount}...\n")
+        print(f"Going to count {targetCount}...\n")
 
         # Initialise PID objects
         m0PID = PID(
@@ -366,9 +366,10 @@ class MyRobot:
                 return m
         return None
 
-    def drive_to(self, target_marker) -> bool:
+    def drive_to(self, target_marker, minus=0) -> bool:
         if target_marker.position.distance > 1000:
-            self.forward(((target_marker.position.distance / 1000) - 0.2) * 0.75)
+            self.right(target_marker.position.horizontal_angle, True)
+            self.forward(((target_marker.position.distance / 1000) - 0.2 - minus) * 0.75)
             visible_markers = self.camera.find_all_markers()
             print("Visible markers:", visible_markers)
 
@@ -394,10 +395,10 @@ class MyRobot:
             print("New marker info:", new_target_marker)
 
             self.right(new_target_marker.position.horizontal_angle, True)
-            self.forward((new_target_marker.position.distance / 1000) - 0.1)
+            self.forward((new_target_marker.position.distance / 1000) - 0.1 - minus)
         else:
             self.right(target_marker.position.horizontal_angle, True)
-            self.forward((target_marker.position.distance / 1000) - 0.1)
+            self.forward((target_marker.position.distance / 1000) - 0.1 - minus)
         
         print("Drive: arrived.")
         return True
