@@ -68,7 +68,7 @@ class MyRobot:
         return max(min(x, pmax), pmin)
 
     def __initialAccelCurve(self, endCount, currentCount):        
-        return (1- self.__INIT_PWR) / (endCount) * currentCount + self.__INIT_PWR
+        return val if (val := (1- self.__INIT_PWR) / (endCount) * currentCount + self.__INIT_PWR > self.__INIT_PWR) else self.__INIT_PWR
     
     def __powerByCount(self, pCount, pidObject, tCount, rot):
 
@@ -210,7 +210,7 @@ class MyRobot:
             time.sleep(0.005)
 
         self.stop()
-     #   self.ROBOT.sleep(.5)
+        self.ROBOT.sleep(.5)
 
     def __RobotRotate(self, pAngle, SPECIAL_κ):
         fac = 1
