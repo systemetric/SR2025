@@ -218,7 +218,7 @@ class MyRobot:
 
             m0LastCount = m0Count
             m1LastCount = m1Count
-            print(message)
+            # print(message)
             # self.DEBUGGER.debug(message)
             message = ""
             time.sleep(0.005)

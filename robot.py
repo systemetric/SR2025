@@ -47,7 +47,7 @@ TARGET_HIGHRISE = 195 + robot.zone
 print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
 
 runningCompetition = True
-visitedMarkers = []
+delivered_markers = []
 
 
 class RobotState(enum.Enum):
@@ -75,10 +75,10 @@ while runningCompetition:
             total_search_rotation = 0
             continue
         
-        markers = filter(lambda x: x.id not in visitedMarkers, markers)
+        markers = filter(lambda x: x.id not in delivered_markers, markers)
 
         pallet_markers = robot.camera.check_if_markers_are_our_pallets(
-            markers, ignored_markers=visitedMarkers
+            markers, ignored_markers=delivered_markers
         )
 
         # if we have turned all the way around, not found anything, reverse.
@@ -110,13 +110,13 @@ while runningCompetition:
         robot.grab()
 
         if (robot.pump_grabbing_noise_based()):
-            visitedMarkers.append(pallet.id)
+            delivered_markers.append(pallet.id)
             print("Grabbed pallet :)")
             robot.reverse(1)
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
-            robot.drop()
+            robot.place()
             robot.reverse(1)
             state = RobotState.LOOKING_FOR_CUBES
 
@@ -143,16 +143,23 @@ while runningCompetition:
         print("Plinth found:", plinth)
 
         if plinth and robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            robot.drive_to(plinth)
+            if not robot.drive_to(plinth):
+                print("Couldn't find plinth")
+                robot.right(30)
+                continue
+            robot.reverse(0.2)
             state = RobotState.PLACE
         elif plinth and not robot.camera.is_pallet_on_plinth(markers, TARGET_HIGHRISE):
-            robot.drive_to(plinth)
+            if not robot.drive_to(plinth):
+                print("Couldn't find plinth")
+                robot.right(30)
+                continue
             state = RobotState.PLACE
         else:
             # go to a marker we've already moved (it must be near the highrise as we've moved it previously.)
             target = None
             for marker in markers:
-                if marker.id in visitedMarkers:
+                if marker.id in delivered_markers:
                     target = marker
                     break
 
@@ -161,13 +168,14 @@ while runningCompetition:
                 robot.right(15)
             else:
                 # go to target place cube
-                robot.right(target.position.horizontal_angle, isRadians=True)
-                robot.forward(((target.position.distance) / 1000))
+                if not robot.drive_to(target):
+                    print("Couldn't find plinth")
+                    robot.right(30)
+                    continue
                 state = RobotState.PLACE
 
     elif state == RobotState.PLACE:
         robot.place()
-        sys.exit(0)
         robot.reverse(1)
         state = RobotState.LOOKING_FOR_CUBES
 
