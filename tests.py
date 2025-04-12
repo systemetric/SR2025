@@ -32,12 +32,22 @@ class TestRobot(unittest.TestCase):
     def drive_right_triangle(self):
         """Drive in a triangle, turns right each time.
         """
-        robot.forward(1.5)
+      #  robot.forward(1.5)
         robot.right(145)
-        robot.forward(1.5 * (2**0.5))
-        robot.right(145)
-        robot.forward(1.5)
-        robot.right(90)
+       # robot.forward(1.5 * (2**0.5))
+        #robot.right(145)
+        #robot.forward(1.5)
+        #robot.right(90)
+
+    def drive_full(self):
+        robot.scissor_up()
+        robot.forward(0.5)
+        robot.right(180)
+        robot.forward(0.5)
+        robot.reverse(0.5)
+        robot.left(180)
+        robot.reverse(0.5)
+        robot.scissor_down()
 
     def up_down_12_billion(self):
         for _ in range(100):
@@ -46,7 +56,7 @@ class TestRobot(unittest.TestCase):
             robot.scissor_up()
             robot.sleep(0.1)
             if len(robot.see_and_capture()) != 0:
-                break;
+                break
     
     def back_forwards_12_billion(self):
         while len(robot.see_and_capture("beans.png")) == 0:

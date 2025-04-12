@@ -1,4 +1,4 @@
-from sr.robot3 import *
+from sr.robot3 import * # type: ignore
 import time, math
 import util
 from datetime import datetime
@@ -20,22 +20,28 @@ class MyRobot:
     DEBUGGER = None
     __M0FAC = 1
     __M1FAC = 1
+    __ACCEL_FAC = 1
     __ACCEL_CONST = 0.05
     __INIT_PWR = 0.2
+    __NO_ACCEL = False
+    __SUB_ACCURACY = 30
     __ROT_FAC = 1
     __LAC_MOVE_TIMES = [9, 8]
 
 
-    def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False):
+    def __init__(self, revolDist = 0.392, targetMotors = [0,1], accuracy = 30, dbgEnabled = True, dbgPassThrough = False, noAccel = False):
         self.__REVOL_DIST = revolDist
         self.__TARGET_MOTORS = targetMotors
         self.__ACCURACY = accuracy
+        self.__SUB_ACCURACY = accuracy / 2
+
+        self.__NO_ACCEL = noAccel
 
         self.ROBOT = Robot(raw_ports = [(self.__ARDUINO_SERIAL, self.__BAUD)]) # type: ignore
         self.__MOTOR_MB = self.ROBOT.motor_boards["SR0UK1L"]
         self.__PUMP_MB = self.ROBOT.motor_boards["SR0TJ1P"]
 
-        if self.ROBOT.mode == COMP:
+        if self.ROBOT.mode == COMP: # type: ignore
             self.zone = self.ROBOT.zone
         else:
             self.zone = 2
@@ -62,9 +68,11 @@ class MyRobot:
         return max(min(x, pmax), pmin)
 
     def __initialAccelCurve(self, endCount, currentCount):        
-        return (1- self.__INIT_PWR)/(endCount) * currentCount + self.__INIT_PWR
+        return (1- self.__INIT_PWR) / (endCount) * currentCount + self.__INIT_PWR
     
     def __powerByCount(self, pCount, pidObject, tCount, rot):
+
+        """
         fac = 1
         if abs(pCount) < abs(tCount * self.__ACCEL_CONST) and not rot:
             fac = self.__initialAccelCurve(tCount * self.__ACCEL_CONST,pCount)
@@ -72,8 +80,9 @@ class MyRobot:
             fac = self.__ROT_FAC
 
         print(f"Factor: {fac}\n")
+        """
 
-        return pidObject(pCount) * fac
+        return pidObject(pCount)
 
     def __count_correct(self, m0Count, m1Count, target):
         # MAYBE BAD      
@@ -85,21 +94,19 @@ class MyRobot:
         print(f"cd: {countDelta}, f: {factor}")
         res = [1,1]
         if m0Count > m1Count:
-    
             res = [factor, 1]
         elif m0Count < m1Count:
             res = [1, factor]
-        
+
+
         #if target < 0:
         #    res = res[::-1]
 
         self.__M0FAC, self.__M1FAC = res
 
-    def __RobotDrive(self, pDistance, rotate=False, rotateFactor=1):
+    def __RobotDrive(self, pDistance, rotate=False, dampenFactor=1):
         self.__M0FAC = 1
         self.__M1FAC = 1
-
-        self.__ROT_FAC = rotateFactor
 
         print(f"Started drive: pDistance: {pDistance}, targets = {self.__TARGET_MOTORS}")
         
@@ -126,6 +133,9 @@ class MyRobot:
         self.ROBOT.arduino.command("c")
         initialTime = time.time()
         lastTime = initialTime
+
+        sCount0 = 0
+        sCount1 = 0
 
         message = ""
         while not m0reached or not m1reached:
@@ -159,18 +169,35 @@ class MyRobot:
            # if not rotate:
             self.__count_correct(m0Count, m1Count, targetCount)
 
+
+            
+            if (abs((average := (m0Count + m1Count)/2))) < abs(targetCount * self.__ACCEL_CONST) and not rotate and not self.__NO_ACCEL:
+                self.__M0FAC *= (fac := self.__initialAccelCurve(targetCount * self.__ACCEL_CONST,average))
+                self.__M1FAC *= fac
+                print(f"Factor: {fac}\n")
+
+
+
             if 0 in self.__TARGET_MOTORS and not m0reached:
-                self.__MOTOR_MB.motors[0].power = (m0Power := self.__M0FAC * self.__powerByCount(m0Count, m0PID, targetCount, rotate))
+                self.__MOTOR_MB.motors[0].power = (m0Power := dampenFactor * self.__M0FAC * self.__powerByCount(m0Count, m0PID, targetCount, rotate))
                 message += f"M0: Count: {m0Count}, M0Fac: {self.__M0FAC}, M0Power; {m0Power}\n"
-                m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and abs(m0χ) < 20
+
+                if abs(m0χ) < 20:
+                    sCount0 += 1
+
+                m0reached = abs(abs(targetCount) - abs(m0Count)) < self.__ACCURACY and sCount0 > 20
                 if m0reached:
                     message += "Stopped M0\n"
                     self.__setReached(motors=[0])
 
             if  1 in self.__TARGET_MOTORS and not m1reached:
-                self.__MOTOR_MB.motors[1].power = (m1Power := self.__M1FAC * self.__powerByCount(m1Count, m1PID, targetCount, rotate))
+                self.__MOTOR_MB.motors[1].power = (m1Power := dampenFactor * self.__M1FAC * self.__powerByCount(m1Count, m1PID, targetCount, rotate))
                 message += f"M1: Count: {m1Count}, M1Fac: {self.__M1FAC}, M1Power; {m1Power}\n"
-                m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and abs(m1χ) < 20
+
+                if abs(m1χ) < 20:
+                    sCount1 += 1
+
+                m1reached = abs(abs(targetCount) - abs(m1Count)) < self.__ACCURACY and sCount1 > 20
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
@@ -180,7 +207,7 @@ class MyRobot:
             print(message)
             #self.DEBUGGER.debug(message)
             message = ""
-            time.sleep(0.05)
+            time.sleep(0.005)
 
         self.stop()
      #   self.ROBOT.sleep(.5)
@@ -197,7 +224,7 @@ class MyRobot:
 
         #SPECIAL_κ = 1.165890625 #1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
 
-        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True, rotateFactor=fac)
+        self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True, dampenFactor = fac)
         
     def __setLacState(self, v):
         self.__PUMP_MB.motors[1].power = v
@@ -257,12 +284,20 @@ class MyRobot:
     def forward(self, distance):
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
-        self.__RobotDrive(distance)
+
+        if distance < 1:
+            self.__RobotDrive(distance, dampenFactor = 0.5)
+        else:
+            self.__RobotDrive(distance)
 
     def reverse(self, distance):
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
-        self.__RobotDrive(-distance)
+
+        if distance > -1:
+            self.__RobotDrive(-distance, dampenFactor = 0.5)
+        else:
+            self.__RobotDrive(-distance)
 
     def right(self, angle, isRadians = False):
         self.__REVERSE = [-1, 1]
