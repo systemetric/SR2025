@@ -22,7 +22,7 @@ class MyRobotCamera:
 
         palletMarkers = []
         for marker in markers:
-            if marker.id >= 100 and marker.id <= 179 and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
+            if marker.id >= 100 + 20 * self.zone and marker.id < 120 + 20 * self.zone and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
                 palletMarkers.append(marker)
 
         # sorts palletMarkers into least to highest distance
@@ -43,7 +43,7 @@ class MyRobotCamera:
 
         highRiseMarkers = []
         for marker in markers:
-            if marker.id >= 195 and marker.id <= 198 and marker.position.distance < self.MIN_DIST:
+            if marker.id == 195 + self.zone  and marker.position.distance < self.MIN_DIST:
                 highRiseMarkers.append(marker)
 
         # sorts highRiseMarkers into least to highest distance

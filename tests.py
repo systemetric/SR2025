@@ -33,7 +33,8 @@ class TestRobot(unittest.TestCase):
         """Drive in a triangle, turns right each time.
         """
       #  robot.forward(1.5)
-        robot.right(145)
+        robot.right(180)
+        robot.left(180)
        # robot.forward(1.5 * (2**0.5))
         #robot.right(145)
         #robot.forward(1.5)
@@ -41,12 +42,12 @@ class TestRobot(unittest.TestCase):
 
     def drive_full(self):
         robot.scissor_up()
-        robot.forward(0.5)
+        robot.forward(1)
         robot.right(180)
-        robot.forward(0.5)
-        robot.reverse(0.5)
+        robot.forward(1)
+        robot.reverse(1)
         robot.left(180)
-        robot.reverse(0.5)
+        robot.reverse(1)
         robot.scissor_down()
 
     def up_down_12_billion(self):
@@ -98,14 +99,14 @@ class TestRobot(unittest.TestCase):
             robot.sleep(0.5)
         
     def lots_of_rotation_right(self):
-        robot.right(360 * 100)
+        robot.right(360 * 20)
 
     def lots_of_rotation_left(self):
-        robot.right(360 * 100)
+        robot.right(360 * 20)
 
     def rotate_20(self):
-        for i in range(18):
-            robot.right(16.6)
+        robot.right(360)
+       # robot.left(360)
     
     def pump_on_off(self):
         """Turn on pump for ten seconds then turn it off.
@@ -249,36 +250,48 @@ class TestRobot(unittest.TestCase):
 
         return (((-κ2) + math.sqrt(κ2**2 - 4 * κ3 * (κ1 - x/1000))) / (2 * κ3))
 
-    def pick_up_cube(self, mrc, i, g):
-        for i in range(18):
-            robot.right(20)
+    
+    def goToMarker(self, camera, cubeOrPlynth, grabNotDrop):
 
-            m = []
-            if i == 0:
-                m = mrc.find_pallet_markers()
-            elif i == 1:
-                m = mrc.find_high_rise_markers()
+        distIters = 4
+        numberOfTurns = 9
+        for _ in range(numberOfTurns):
+            robot.right(360//numberOfTurns)
 
-            if len(m) > 0:
-                for i in range(4):
-                    if i == 0:
-                        m = mrc.find_pallet_markers()
-                    elif i == 1:
-                        m = mrc.find_high_rise_markers()
+            markers = []
+            if cubeOrPlynth == 0:
+                markers = camera.find_pallet_markers()
+            elif cubeOrPlynth == 1:
+                markers = camera.find_high_rise_markers()
+                
 
-                    if len(m) > 0:
-                        print(f"{i}:")
-                        for mx in m:
-                            print(f"    ID = {mx.id}    Distance = {mx.position.distance}    Angle = {mx.position.horizontal_angle}")
+            if len(markers) > 0:
+                for i in range(distIters):
+                    if cubeOrPlynth == 0:
+                        markers = camera.find_pallet_markers()
+                    elif cubeOrPlynth == 1:
+                        markers = camera.find_high_rise_markers()
 
-                        closest = m[0]
+                    if len(markers) > 0:
+                        closest = markers[0]
                         robot.right(closest.position.horizontal_angle, isRadians=True)
-                        robot.forward(self.dist_func(closest.position.distance) / (4 - i))
+                        robot.forward(self.dist_func(closest.position.distance) / (distIters - i))
 
-                if g == True:
+                if grabNotDrop == True:
                     robot.grab()
                 else:
                     robot.drop()
+    
+
+    def game(self, camera):
+        backOff = 0.75
+        self.goToMarker(camera, 0, True)
+        robot.reverse(backOff)
+        self.goToMarker(camera, 1, False)
+
+    def game_test(self):
+        self.game(robot.camera)
+        
 
     def navigate_to_cube(self):
         mrc = MyRobotCamera(robot)
@@ -297,10 +310,10 @@ class TestRobot(unittest.TestCase):
                 robot.forward((closest.position.distance) / 1000)
                 robot.grab()
 
-    def go_to_cube(self, m):
+    def go_to_cube(self, camera):
         for i in range(4):
-            robot.right(m.position.horizontal_angle, isRadians=True)
-            robot.forward(self.dist_func(m.position.distance) / (4 - i))
+            robot.right(camera.position.horizontal_angle, isRadians=True)
+            robot.forward(self.dist_func(camera.position.distance) / (4 - i))
 
     def game_tests(self):
         mrc = MyRobotCamera(robot)

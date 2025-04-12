@@ -12,7 +12,7 @@ tests_to_run = [
     #"lots_of_rotation_left",
     #"lots_of_rotation_right",
     #"rotate_20",
-    "drive_full",
+    #"drive_full",
     #"drive_reverse",
     #"drive_back_forwards",
     #"drive_back_forwards",
@@ -31,12 +31,14 @@ tests_to_run = [
     # "pump_toggler"
     #"back_forwards_12_billion",
     # "up_down_12_billion",
-    #"game_tests"
+    "game_test",
+    #"game",
 ]
-
+#
 if TESTING:
     import tests #Avoid double robot declaration by importing here
     unittest.main(module=tests.TestRobot, verbosity=2, defaultTest=tests_to_run)
+    sys.exit(0)
     # unittest.main exists after completion
 
 robot = MyRobot(accuracy=10, dbgEnabled=False)

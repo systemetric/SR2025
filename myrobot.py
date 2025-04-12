@@ -204,7 +204,7 @@ class MyRobot:
 
             m0LastCount = m0Count
             m1LastCount = m1Count
-            print(message)
+          #  print(message)
             #self.DEBUGGER.debug(message)
             message = ""
             time.sleep(0.005)
@@ -222,7 +222,7 @@ class MyRobot:
         arcRadius = 0.425 # m
         halfArc = arcRadius * math.pi # m
 
-        #SPECIAL_κ = 1.165890625 #1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
+       # SPECIAL_κ = 1.2 #1.0127125 # Old: 1.0087125 ## DO NOT CHANGE!
 
         self.__RobotDrive(halfArc * (pAngle / 180) * 0.5 * SPECIAL_κ, rotate=True, dampenFactor = fac)
         
@@ -285,33 +285,33 @@ class MyRobot:
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance < 1:
-            self.__RobotDrive(distance, dampenFactor = 0.5)
-        else:
-            self.__RobotDrive(distance)
+  #      if distance < 1:
+   #         self.__RobotDrive(distance, dampenFactor = 0.5)
+    #    else:
+        self.__RobotDrive(distance)
 
     def reverse(self, distance):
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance > -1:
-            self.__RobotDrive(-distance, dampenFactor = 0.5)
-        else:
-            self.__RobotDrive(-distance)
+    #    if distance > -1:
+     #       self.__RobotDrive(-distance, dampenFactor = 0.5)
+      #  else:
+        self.__RobotDrive(-distance)
 
     def right(self, angle, isRadians = False):
         self.__REVERSE = [-1, 1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi), 1.1325)
+            self.__RobotRotate(angle * (180 / math.pi), 1.125)
         else:
-            self.__RobotRotate(angle, 1.1325)
+            self.__RobotRotate(angle, 1.125)
 
     def left(self, angle, isRadians = False):
         self.__REVERSE = [1, -1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi), 1.29725)
+            self.__RobotRotate(angle * (180 / math.pi), 1.19725)
         else:
-            self.__RobotRotate(angle, 1.29725)
+            self.__RobotRotate(angle, 1.19725)
     
     def grab(self):
         self.pump = True
