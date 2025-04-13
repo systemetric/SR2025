@@ -163,8 +163,13 @@ class MyRobot:
         sCount0 = 0
         sCount1 = 0
 
+        low_count = 0
+        LOW_COUNT_THRESHOLD = 500
+
         message = ""
-        while not m0reached or not m1reached:
+        total_ticks = 0
+        while (not m0reached or not m1reached) and low_count < LOW_COUNT_THRESHOLD:
+            total_ticks += 1
 
             # Get current motor count
             receivedData = self.ROBOT.arduino.command("m")
@@ -206,7 +211,7 @@ class MyRobot:
                     )
                 )
                 self.__M1FAC *= fac
-                print(f"Factor: {fac}\n")
+                # print(f"Factor: {fac}\n")
 
             if 0 in self.__TARGET_MOTORS and not m0reached:
                 self.__MOTOR_MB.motors[0].power = (
@@ -249,11 +254,21 @@ class MyRobot:
                 if m1reached:
                     message += "Stopped M1\n"
                     self.__setReached(motors=[1])
+            
+            STEP_THRESHOLD = 10
+            if m0δ < STEP_THRESHOLD or m1δ < STEP_THRESHOLD:
+                low_count += 1
+            else:
+                low_count = 0
 
+
+            # CLEANUP
             m0LastCount = m0Count
             m1LastCount = m1Count
             # print(message)
             # self.DEBUGGER.debug(message)
+            if total_ticks % 50 == 0:
+                print(f"0:{m0Count}/{targetCount}|1:{m1Count}/{targetCount}")
             message = ""
 
             self.tick_scissor_complete()

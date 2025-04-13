@@ -167,7 +167,7 @@ while runningCompetition:
                 continue
             state = RobotState.PLACE
         elif plinth:
-            if plinth.position.distance < 400:
+            if plinth.position.distance < 500:
                 print("Too close to plinth, reversing back.")
                 robot.reverse(0.5)
                 continue
