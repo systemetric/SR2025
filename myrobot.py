@@ -258,6 +258,7 @@ class MyRobot:
             STEP_THRESHOLD = 10
             if m0δ < STEP_THRESHOLD or m1δ < STEP_THRESHOLD:
                 low_count += 1
+                print("LOW count")
             else:
                 low_count = 0
 
@@ -265,7 +266,7 @@ class MyRobot:
             # CLEANUP
             m0LastCount = m0Count
             m1LastCount = m1Count
-            # print(message)
+            print(message)
             # self.DEBUGGER.debug(message)
             if total_ticks % 50 == 0:
                 print(f"0:{m0Count}/{targetCount}|1:{m1Count}/{targetCount}")
@@ -416,9 +417,9 @@ class MyRobot:
     def right(self, angle, isRadians=False):
         self.__REVERSE = [-1, 1]
         if isRadians:
-            self.__RobotRotate(angle * (180 / math.pi), 1.1325)
+            self.__RobotRotate(angle * (180 / math.pi), 1.1425)
         else:
-            self.__RobotRotate(angle, 1.1325)
+            self.__RobotRotate(angle, 1.1425)
 
     def left(self, angle, isRadians=False):
         self.__REVERSE = [1, -1]

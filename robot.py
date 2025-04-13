@@ -49,7 +49,7 @@ if TESTING:
 # Reduce threshold for slow drive **
 # Time game round for centre knock **
 
-robot = MyRobot(accuracy=40, dbgEnabled=False)
+robot = MyRobot(accuracy=20, dbgEnabled=False)
 
 TARGET_HIGHRISE = 195 + robot.zone
 print("Hello world! I'm looking for high rise:", TARGET_HIGHRISE)
@@ -75,6 +75,8 @@ while runningCompetition:
     print("Current state:", state)
     print("Seconds left:", robot.get_seconds_remaining())
     print("Delivered Markers", delivered_markers)
+    if len(delivered_markers) >= 3:
+        break
 
     if state == RobotState.LOOKING_FOR_CUBES:
         # find a pallet marker to navigate to
@@ -130,7 +132,7 @@ while runningCompetition:
         else:
             print("Cube grab failed. Restarting...")
             robot.drop()
-            robot.reverse(0.7)
+            robot.reverse(0.3)
             state = RobotState.LOOKING_FOR_CUBES
         
         '''
@@ -148,6 +150,12 @@ while runningCompetition:
         # camera find all markers
         markers = robot.camera.find_all_markers()
 
+        if len(markers) == 0:
+            print("No markers found. Reversing 1m.")
+            robot.reverse(1)
+            total_search_rotation = 0
+            continue
+
         # look for our high rise
         plinth = None
         for marker in markers:
@@ -161,7 +169,7 @@ while runningCompetition:
 
         if plinth and pallet_on_plinth:
             print("Stacked plinth")
-            if not robot.drive_to(plinth, minus=0.2):
+            if not robot.drive_to(plinth, minus=0.25):
                 print("Couldn't find plinth")
                 robot.right(30)
                 continue
