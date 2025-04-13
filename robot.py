@@ -125,12 +125,12 @@ while runningCompetition:
         if robot.pump_grabbing_noise_based():
             delivered_markers.append(pallet.id)
             print("Grabbed pallet :)")
-            robot.reverse(0.5)
+            robot.reverse(0.2)
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
             robot.drop()
-            robot.reverse(0.5)
+            robot.reverse(0.7)
             state = RobotState.LOOKING_FOR_CUBES
         
         '''
@@ -167,6 +167,11 @@ while runningCompetition:
                 continue
             state = RobotState.PLACE
         elif plinth:
+            if plinth.position.distance < 400:
+                print("Too close to plinth, reversing back.")
+                robot.reverse(0.5)
+                continue
+
             print("Clear plinth")
             if not robot.drive_to(plinth):
                 print("Couldn't find plinth")
@@ -196,7 +201,7 @@ while runningCompetition:
     elif state == RobotState.PLACE:
         robot.async_place()
         # robot.async_place()
-        robot.reverse(0.5)
+        robot.reverse(1)
         turn_dir = -1
         state = RobotState.LOOKING_FOR_CUBES
 

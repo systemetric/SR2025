@@ -344,7 +344,7 @@ class MyRobot:
         self.pump = True
         self.scissor_down_carefully()
         self.sleep(1)
-        self.start_scissor_up(3)
+        self.start_scissor_up(5)
 
     async_scissoring = False
 
@@ -384,7 +384,7 @@ class MyRobot:
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance < 0.6:
+        if distance < 0.8:
             self.__RobotDrive(distance, dampenFactor=0.5)
         else:
             self.__RobotDrive(distance)
@@ -393,7 +393,7 @@ class MyRobot:
         self.__TARGET_MOTORS = [0, 1]
         self.__REVERSE = [1, 1]
 
-        if distance > -0.6:
+        if distance > -0.8:
             self.__RobotDrive(-distance, dampenFactor=0.5)
         else:
             self.__RobotDrive(-distance)
