@@ -71,6 +71,7 @@ robot.forward(1)
 
 state = RobotState.LOOKING_FOR_CUBES
 total_search_rotation = 0
+grab_fails = 0
 while runningCompetition:
     print("Current state:", state)
     print("Seconds left:", robot.get_seconds_remaining())
@@ -133,6 +134,7 @@ while runningCompetition:
             print("Cube grab failed. Restarting...")
             robot.drop()
             robot.reverse(0.3)
+            robot.right(5)
             state = RobotState.LOOKING_FOR_CUBES
         
         '''

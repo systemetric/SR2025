@@ -266,7 +266,7 @@ class MyRobot:
             # CLEANUP
             m0LastCount = m0Count
             m1LastCount = m1Count
-            print(message)
+            # print(message)
             # self.DEBUGGER.debug(message)
             if total_ticks % 50 == 0:
                 print(f"0:{m0Count}/{targetCount}|1:{m1Count}/{targetCount}")
@@ -282,7 +282,7 @@ class MyRobot:
     def __RobotRotate(self, pAngle, SPECIAL_κ):
         fac = 1
 
-        if pAngle < 180 and pAngle >= 20:
+        if pAngle < 180 and pAngle >= 10:
             fac = 0.5
 
         self.DEBUGGER.debug(f"Started rotate by {pAngle}...")
@@ -388,8 +388,8 @@ class MyRobot:
 
     def pump_grabbing_noise_based(self):
         outliers = 0
-        for _ in range(5):
-            if self.__getPumpCurrentDraw() > 0.7:
+        for _ in range(10):
+            if self.__getPumpCurrentDraw() > 0.65:
                 outliers += 1
             self.sleep(0.1)
 
@@ -509,10 +509,10 @@ class MyRobot:
             print("New marker info:", new_target_marker)
 
             self.right(new_target_marker.position.horizontal_angle, True)
-            self.forward((new_target_marker.position.distance / 1000) - 0.1 - minus)
+            self.forward((new_target_marker.position.distance / 1000) - 0.12 - minus)
         else:
             self.right(target_marker.position.horizontal_angle, True)
-            self.forward((target_marker.position.distance / 1000) - 0.1 - minus)
+            self.forward((target_marker.position.distance / 1000) - 0.12 - minus)
 
         print("Drive: arrived.")
         return True
