@@ -122,27 +122,27 @@ while runningCompetition:
         print("Grabbing pallet...")
         robot.async_grab_carefully()
 
-        '''
         if robot.pump_grabbing_noise_based():
             delivered_markers.append(pallet.id)
             print("Grabbed pallet :)")
-            robot.reverse(0.6)
+            robot.reverse(0.5)
             state = RobotState.LOOKING_FOR_DISTRICT
         else:
             print("Cube grab failed. Restarting...")
             robot.drop()
-            robot.reverse(0.6)
+            robot.reverse(0.5)
             state = RobotState.LOOKING_FOR_CUBES
         
+        '''
         *** HOTEL ROOM TESTING CODE: ***  
         Swap the below with the above! 
-        '''
-        robot.reverse(0.6)
+        
+        robot.reverse(0.5)
         delivered_markers.append(pallet.id)
         print(
             "Added pallet to visited markers. Not checking for pallet actually grabbed!"
         )
-        state = RobotState.LOOKING_FOR_DISTRICT
+        state = RobotState.LOOKING_FOR_DISTRICT'''
 
     elif state == RobotState.LOOKING_FOR_DISTRICT:
         # camera find all markers
@@ -196,7 +196,7 @@ while runningCompetition:
     elif state == RobotState.PLACE:
         robot.async_place()
         # robot.async_place()
-        robot.reverse(0.6)
+        robot.reverse(0.5)
         turn_dir = -1
         state = RobotState.LOOKING_FOR_CUBES
 
