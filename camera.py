@@ -11,9 +11,9 @@ class MyRobotCamera:
         self.__NEXT_OBJ = self.__MARKER_PALLET
         self.zone = zone
 
-    def find_pallet_markers(self, ignored_markers:list = []):
+    def check_if_markers_are_our_pallets(self, markers, ignored_markers:list = []):
         # markers = self.ROBOT.ROBOT.camera.see(save=f"capture.jpg")
-        markers = self.ROBOT.camera.see()
+        # markers = self.ROBOT.camera.see()
 
         MIN_PALLET = (self.zone * 20) + 100
         MAX_PALLET = MIN_PALLET + 19
@@ -22,7 +22,7 @@ class MyRobotCamera:
 
         palletMarkers = []
         for marker in markers:
-            if marker.id >= 100 and marker.id <= 179 and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
+            if marker.id >= MIN_PALLET and marker.id <= MAX_PALLET and marker.position.distance < self.MIN_DIST and marker.id not in ignored_markers:
                 palletMarkers.append(marker)
 
         # sorts palletMarkers into least to highest distance
@@ -47,13 +47,16 @@ class MyRobotCamera:
                 highRiseMarkers.append(marker)
 
         # sorts highRiseMarkers into least to highest distance
-        for i in range(len(highRiseMarkers) - 1):
+        highRiseMarkers.sort(key=lambda m: m.position.distance)
+
+        '''for i in range(len(highRiseMarkers) - 1):
             if highRiseMarkers[i].position.distance > highRiseMarkers[i + 1].position.distance:
-                highRiseMarkers[i], highRiseMarkers[i + 1] = highRiseMarkers[i + 1], highRiseMarkers[i]
+                highRiseMarkers[i], highRiseMarkers[i + 1] = highRiseMarkers[i + 1], highRiseMarkers[i]'''
         
         return highRiseMarkers
 
     def is_pallet_on_plinth(self, markers: list, plinth_id: int) -> bool:
+        # use our list of passed in markers to check if a pallet is present on the plinth.
         plinth = None
         
         for marker in markers:
@@ -64,21 +67,22 @@ class MyRobotCamera:
         if plinth == None:
             return False
         
+        # if the marker is between the left and right boundaries of the plinth, it is on the plinth.
         for marker in markers:
-            plinth_scaled_angle = plinth.position.horizontal_angle / plinth.position.distance
-            marker_scaled_angle = marker.position.horizontal_angle / marker.position.distance
-            if marker.id != plinth_id and marker_scaled_angle >= plinth_scaled_angle - 0.1 and marker_scaled_angle <= plinth_scaled_angle + 0.1 and marker.position.vertical_angle > plinth.position.vertical_angle:
+            if marker.position.vertical_angle > plinth.position.vertical_angle + 0.1:
                 return True
         
         return False
 
-    def find_all_markers(self):
+    def find_all_markers(self) -> list:
         markers = self.ROBOT.camera.see()
 
+        markers.sort(key=lambda m: m.position.distance)
+
         # sorts markers into least to highest distance
-        for i in range(len(markers) - 1):
+        '''for i in range(len(markers) - 1):
             if markers[i].position.distance > markers[i + 1].position.distance:
-                markers[i], markers[i + 1] = markers[i + 1], markers[i]
+                markers[i], markers[i + 1] = markers[i + 1], markers[i]'''
         
         return markers
 

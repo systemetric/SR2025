@@ -17,6 +17,9 @@ class TestRobot(unittest.TestCase):
         robot.beep_sync(880, 0.1, 0.05) #A
         robot.beep_sync(880, 0.3, 0.05) #A
         robot.sleep(1)
+    
+    def drive_for_scores(self):
+        robot.forward(1)
 
     def drive_reverse(self):
         robot.reverse(0.5)
@@ -156,17 +159,17 @@ class TestRobot(unittest.TestCase):
                 robot.sleep(0.5)
                 robot.beep_sync(262, 0.15, 0.05) #C
             robot.sleep(5)
-
-    # WILL CRASH
+    
     def scissor_read_current(self):
         """Stream current from linear actuator.
         """
-        robot.d__setLacState(-1)
+        robot.await_scissor_complete()
+        robot.getPUMP_MB().motors[1].power = -1
         print("time, current")
         for i in range(200):
-            print(f"{i*0.1}, {robot.pumpmb().motors[1].current}")
+            print(f"{i*0.1}, {robot.getPUMP_MB().motors[1].current}")
             robot.sleep(0.1)
-        robot.d__setLacState(0)
+        robot.getPUMP_MB().motors[1].power = 0
         
     def pump_read_current(self):
         """Stream current from pump.
@@ -322,6 +325,35 @@ class TestRobot(unittest.TestCase):
                     robot.drop()
                     found = False
                 robot.left(10)
+    
+    def log_lac_values(self):
+        csv = open(os.path.join(robot.ROBOT.usbkey, 'laccedy-lac-lac.csv'), "a")
+        robot.getPUMP_MB().motors[1].power = -1
+
+        print("Scissor going down...")
+        while robot.getPUMP_MB().motors[1].current < 0.2:
+            csv.write(str(robot.getPUMP_MB().motors[1].current)+"\n")
+            self.sleep(0.1)
+        
+        print("Scissor down.")
+        robot.getPUMP_MB().motors[1].power = 0
+
+        time.sleep(0.2)
+
+        csv.write("UP")
+
+        robot.getPUMP_MB().motors[1].power = 1
+
+        print("Scissor going up...")
+        while robot.getPUMP_MB().motors[1].current < 0.2:
+            csv.write(str(robot.getPUMP_MB().motors[1].current)+"\n")
+            self.sleep(0.1)
+        
+        print("Scissor up.")
+        robot.getPUMP_MB().motors[1].power = 0
+
+        csv.close()
+
 
 
 if __name__ == '__main__':
